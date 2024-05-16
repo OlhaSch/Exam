@@ -1,0 +1,55 @@
+input {
+    display: block; /* Зробити елемент блоковим, щоб можна було задати margin: auto; */
+    width: 50%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+}
+
+
+input[type="email"]:focus {
+    border-color: #0056b3;
+}
+
+form {
+    max-width: 50%; /* Максимальна ширина форми */
+    margin: 0 auto; /* Вирівнювання по центру */
+    padding: 20px;
+    background-color: #fff; /* Колір фону форми */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тінь форми */
+}
+
+.head-auth-fill {
+    width: 100%; /* Займає всю доступну ширину */
+    max-width: 400px; /* Максимальна ширина блоку */
+    margin: 0 auto; /* Вирівнювання по центру */
+    text-align: center; /* Вирівнювання тексту по центру */
+}
+
+/* Основний стиль кнопки */
+.button {
+    display: block; /* Зробити кнопку блоковим елементом */
+    width: 50%; /* Встановити ширину кнопки (змініть на потрібне значення) */
+    margin: 0 auto; /* Вирівняти по центру */
+    padding: 12px 24px; /* Відступи зверху і знизу 12px, ліворуч і праворуч 24px */
+    font-size: 16px; /* Розмір шрифту */
+    border-radius: 8px; /* Округлені кути */
+    border: none; /* Відсутність рамки */
+    background-color: #007bff; /* Колір фону */
+    color: #fff; /* Колір тексту */
+    cursor: pointer; /* Зміна курсору при наведенні */
+    transition: background-color 0.3s ease-in-out; /* Плавна анімація зміни кольору фону */
+}
+
+
+/* Стиль кнопки при наведенні миші */
+.button:hover {
+    background-color: #0056b3; /* Колір фону при наведенні */
+}

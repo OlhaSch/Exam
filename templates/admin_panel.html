@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ua">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+</head>
+<body>
+<div class="header"></div>
+<div class="auth-main">
+    <div class="auth-main-container">
+        <form method="POST" class="auth-data">
+            <div class="head-auth-fill">
+                <h1>Авторизація</h1>
+            </div>
+            <div class="auth-fill-items">
+                <div class="item ">
+                    <div class="fill-input">
+                        <input type="email" name="email" placeholder="Ел. пошта" value="" required="" autofocus="">
+                    </div>
+                </div>
+                <div class="item ">
+                    <div class="fill-input">
+                        <input type="password" name="password" placeholder="Пароль" required="" autocomplete="current-password">
+                        <div class="pass-show"></div>
+                    </div>
+                </div>
+
+               <button type="submit" class="button">Увійти</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="footer"></div>
+</body>
+</html>
