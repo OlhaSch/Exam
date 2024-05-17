@@ -11,22 +11,27 @@
     <div class="auth-main-container">
         <form method="POST" class="auth-data">
             <div class="head-auth-fill">
-                <h1>Авторизація</h1>
+                <h1>Реєстрація</h1>
             </div>
             <div class="auth-fill-items">
                 <div class="item ">
                     <div class="fill-input">
+                        <input name="name" placeholder="Ім'я" value="" required="" autofocus="">
                         <input type="email" name="email" placeholder="Ел. пошта" value="" required="" autofocus="">
+                        <input type="password" name="password" placeholder="Пароль" required=""
+                               autocomplete="current-password">
                     </div>
                 </div>
-                <div class="item ">
-                    <div class="fill-input">
-                        <input type="password" name="password" placeholder="Пароль" required="" autocomplete="current-password">
-                        <div class="pass-show"></div>
-                    </div>
+                <div class="bottom-auth-fill"
+                     style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <button type="submit" class="button">Увійти</button>
+                    <label class="checkbox-label" style="display: flex; align-items: center; margin: 10px;">
+                        <input type="checkbox" name="data-consent" class="checkbox">
+                        <span class="checkbox-text" style="margin-left: 10px;">Згоден на обробку даних</span>
+                    </label>
                 </div>
 
-               <button type="submit" class="button">Увійти</button>
+
             </div>
         </form>
     </div>
