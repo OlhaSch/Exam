@@ -33,20 +33,20 @@ def get_existing_tables():
         cursor.close()
         conn.close()
 
+
 @app.route('/users')
 def show_users():
     existing_tables = get_existing_tables()
-    if 'Users' in existing_tables:
+    if 'users' in existing_tables:
         conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM Users;')
-        Users = cur.fetchall()
-        cur.close()
+        cursor = conn.cursor()
+        cursor.execute('SELECT login FROM users')
+        users = cursor.fetchall()
+        cursor.close()
         conn.close()
-        print(Users)  # Отображаем результат запроса в консоли
+        return render_template('users.html', users=users)
     else:
         print("Таблица Users не существует")
-
 
 
 @app.route('/admin_panel_auth')
