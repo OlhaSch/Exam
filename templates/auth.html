@@ -9,10 +9,21 @@
 <div class="header"></div>
 <div class="auth-main">
     <div class="auth-main-container">
-        <form method="POST" class="auth-data">
+        <form action="{{ url_for('post_routes.auth') }}" method="POST" class="auth-data">
             <div class="head-auth-fill">
                 <h1>Авторизація</h1>
             </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="messages">
+                        {% for category, message in messages %}
+                            <div class="message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <div class="auth-fill-items">
                 <div class="item ">
                     <div class="fill-input">
