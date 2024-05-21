@@ -1,7 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, flash
 import psycopg2
 
 app = Flask(__name__)
+app.secret_key = 'key'
 def get_db_connection():
     conn = None
     try:
@@ -16,39 +17,28 @@ def get_db_connection():
         print(f"Ошибка при соединении с базой данных: {e}")
     return conn
 
-def get_existing_tables():
+@app.route('/login_admin', methods =['POST'])
+def login_admin():
+    email = request.form['email']
+    password = request.form['password']
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("""
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema = 'public';  -- Указываем схему таблиц (обычно 'public')
-        """)
-        tables = cursor.fetchall()
-        return [table[0] for table in tables]  # Возвращаем список имен таблиц
+        cursor.execute('Select * From users WHERE login = %s AND password = %s', (email, password))
+        user = cursor.fetchone()
+        if user:
+            print(f"Користувача {email} знайдено")
+            return redirect(url_for('admin_panel'))
+        else:
+            flash("Не вірні дані, спробуйте ще раз.", "error")
+            return redirect(url_for('admin_panel_auth'))
     except psycopg2.Error as e:
-        print(f"Ошибка при выполнении запроса: {e}")
+        flash(f"Помилка при виконанні запиту {e}", "error")
+        return redirect(url_for('admin_panel_auth'))
     finally:
         cursor.close()
         conn.close()
-
-
-@app.route('/users')
-def show_users():
-    existing_tables = get_existing_tables()
-    if 'users' in existing_tables:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT login FROM users')
-        users = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return render_template('users.html', users=users)
-    else:
-        print("Таблица Users не существует")
-
-
+    return redirect(url_for('admin_panel_auth'))
 @app.route('/admin_panel_auth')
 def admin_panel_auth():
     return render_template('admin_panel_auth.html')
