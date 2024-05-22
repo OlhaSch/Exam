@@ -69,16 +69,18 @@ def auth():
 def fetch_items():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT subject FROM subject")
+    cursor.execute("SELECT id, subject FROM subject")  # Додали поле id до запиту
     columns = [column[0] for column in cursor.description]
     items = []
     for row in cursor.fetchall():
         item = dict(zip(columns, row))
         # Додаємо URL-адресу зображення до кожного елемента
         item['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
+        item['edit_url'] = '/static/images/pen.png'
         items.append(item)
     conn.close()
     return items
+
 
 
 
@@ -87,3 +89,25 @@ def fetch_items():
 def get_items():
     items = fetch_items()
     return jsonify(items)
+
+
+@post_routes.route('/delete/<int:item_id>', methods=['POST'])
+def delete_item(item_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM subject WHERE id = %s", (item_id,))
+        item = cursor.fetchone()
+        if item is None:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Item not found"}), 404
+
+        cursor.execute("DELETE FROM subject WHERE id = %s", (item_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return '', 204
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
