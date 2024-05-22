@@ -1,6 +1,9 @@
-from flask import Flask,  request, redirect, url_for, flash, Blueprint
+from flask import Flask, request, redirect, url_for, flash, Blueprint, jsonify
 import psycopg2
+import mysql.connector
+
 post_routes = Blueprint('post_routes', __name__)
+
 
 def get_db_connection():
     conn = None
@@ -16,7 +19,8 @@ def get_db_connection():
         print(f"Connection with database: error {e}")
     return conn
 
-@post_routes.route('/login_admin', methods =['POST'])
+
+@post_routes.route('/login_admin', methods=['POST'])
 def login_admin():
     email = request.form['email']
     password = request.form['password']
@@ -37,6 +41,7 @@ def login_admin():
     finally:
         cursor.close()
         conn.close()
+
 
 @post_routes.route('/auth', methods=['POST'])
 def auth():
@@ -59,3 +64,26 @@ def auth():
     finally:
         conn.close()
         cursor.close()
+
+
+def fetch_items():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT subject FROM subject")
+    columns = [column[0] for column in cursor.description]
+    items = []
+    for row in cursor.fetchall():
+        item = dict(zip(columns, row))
+        # Додаємо URL-адресу зображення до кожного елемента
+        item['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
+        items.append(item)
+    conn.close()
+    return items
+
+
+
+
+@post_routes.route('/test_structure/items', methods=['GET'])
+def get_items():
+    items = fetch_items()
+    return jsonify(items)
