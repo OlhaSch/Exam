@@ -77,6 +77,7 @@ def fetch_items():
         # Додаємо URL-адресу зображення до кожного елемента
         item['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
         item['edit_url'] = '/static/images/pen.png'
+        item['add_url'] = '/static/images/add.png'
         items.append(item)
     conn.close()
     return items
