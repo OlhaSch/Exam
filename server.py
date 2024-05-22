@@ -126,3 +126,22 @@ def edit(item_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@post_routes.route('/addSubject', methods=['POST'])
+def add_subject():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM subject")
+        max_id = cursor.fetchone()[0]  # Отримуємо максимальний id
+        new_id = (max_id + 1) if max_id else 1
+        cursor.execute("INSERT INTO subject (id, subject) VALUES (%s, %s)", (new_id, 'Новий розділ'))
+        conn.commit()
+        conn.close()
+        cursor.close()
+        print("max ind:", max_id)
+        return jsonify({"message": "Subject added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
