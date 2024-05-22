@@ -111,3 +111,18 @@ def delete_item(item_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/edit/<int:item_id>', methods=['POST'])
+def edit(item_id):
+    try:
+        new_text = request.json['text']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE subject SET subject = %s WHERE id = %s", (new_text, item_id))
+        conn.commit()
+        conn.close()
+        cursor.close()
+        return '', 204
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
