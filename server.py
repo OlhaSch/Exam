@@ -39,7 +39,6 @@ def login_admin():
         flash(f"Помилка при виконанні запиту {e}", "error")
         return redirect(url_for('admin_panel_auth'))
     finally:
-        cursor.close()
         conn.close()
 
 
@@ -63,7 +62,6 @@ def auth():
         return redirect(url_for('user_auth'))
     finally:
         conn.close()
-        cursor.close()
 
 
 def fetch_items():
@@ -80,17 +78,29 @@ def fetch_items():
         item['add_url'] = '/static/images/add.png'
         items.append(item)
     conn.close()
+    cursor.close()
     return items
-
-
-
-
-
 @post_routes.route('/test_structure/items', methods=['GET'])
 def get_items():
     items = fetch_items()
     return jsonify(items)
 
+@post_routes.route('/test_structure/section/<int:item_id>', methods=['GET'])
+def get_section(item_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM section WHERE id_subject = %s", (item_id,))
+    columns = [column[0] for column in cursor.description]
+    sections = []
+    for row in cursor.fetchall():
+        section = dict(zip(columns, row))
+        section['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
+        section['edit_url'] = '/static/images/pen.png'
+        section['add_url'] = '/static/images/add.png'
+        sections.append(section)
+    conn.close()
+    print("Fetched sections:", sections)
+    return jsonify(sections)
 
 @post_routes.route('/delete/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
@@ -128,6 +138,22 @@ def edit(item_id):
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
 
+@post_routes.route('/addSubject/<int:item_id>', methods=['POST'])
+def addSubject(item_id):
+    try:
+        new_text = request.json['text']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM section")
+        max_id = cursor.fetchone()[0]
+        new_id = (max_id + 1) if max_id else 1
+        cursor.execute('INSERT INTO section (id, section, id_subject) VALUES (%s, %s, %s)', (new_id, new_text, item_id))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Subject added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @post_routes.route('/addSubject', methods=['POST'])
 def add_subject():
