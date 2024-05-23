@@ -68,6 +68,56 @@ function loadItems() {
         .catch(error => console.error('Error:', error));
 }
 
+function loadUnits(sectionId, parentLi) {
+    if (parentLi.classList.contains('loaded')) {
+        return;
+    }
+
+    fetch(`/test_structure/units/${sectionId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Unit data:", data);
+            const ul = document.createElement('ul');
+            ul.classList.add('unit-list');
+            data.forEach(unit => {
+                const li = document.createElement('li');
+                li.textContent = unit.unit;
+                li.style.cursor = 'pointer';
+
+                const imgDelete = document.createElement('img');
+                imgDelete.src = unit.image_url;
+                imgDelete.alt = 'Delete';
+                imgDelete.width = 15;
+                imgDelete.height = 15;
+                imgDelete.style.cursor = 'pointer';
+
+                const imgEdit = document.createElement('img');
+                imgEdit.src = unit.edit_url;
+                imgEdit.alt = 'Edit';
+                imgEdit.width = 15;
+                imgEdit.height = 15;
+                imgEdit.style.cursor = 'pointer';
+
+                const imgAdd = document.createElement('img');
+                imgAdd.src = unit.add_url;
+                imgAdd.alt = 'Add';
+                imgAdd.width = 15;
+                imgAdd.height = 15;
+                imgAdd.style.cursor = 'pointer';
+
+                li.appendChild(imgDelete);
+                li.appendChild(imgEdit);
+                li.appendChild(imgAdd);
+
+                ul.appendChild(li);
+            });
+            parentLi.appendChild(ul);
+            parentLi.classList.add('loaded');
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Виправлено назву параметру на sectionId, оскільки це ідентифікатор секції
 function loadSections(itemId, parentLi) {
     if (parentLi.classList.contains('loaded')) {
         return;
@@ -81,7 +131,7 @@ function loadSections(itemId, parentLi) {
             ul.classList.add('section-list');
             data.forEach(section => {
                 const li = document.createElement('li');
-                li.textContent = section.section; // Використовувати поле 'section'
+                li.textContent = section.section;
                 li.style.cursor = 'pointer';
 
                 const imgDelete = document.createElement('img');
@@ -110,12 +160,52 @@ function loadSections(itemId, parentLi) {
                 li.appendChild(imgAdd);
 
                 ul.appendChild(li);
+
+                li.addEventListener('click', function() {
+                    loadUnits(section.id, li); // Використано section.id
+                });
+
+                // Додамо обробники подій для кнопок видалення, редагування та додавання
+                imgDelete.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    fetch(`/deleteSection/${section.id}`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                li.remove();
+                            } else {
+                                console.error('Failed to delete section');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+
+                imgEdit.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    editSection(section.id);
+                });
+
+                imgAdd.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    addUnits(section.id);
+                });
             });
             parentLi.appendChild(ul);
             parentLi.classList.add('loaded');
         })
         .catch(error => console.error('Error:', error));
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 document.getElementById('addSubjectButton').addEventListener('click', function(event) {
     event.preventDefault();
@@ -215,3 +305,79 @@ function addSubject(itemId) {
         modal.remove();
     });
 }
+function createSubjectModal(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <textarea id="edit-text" rows="4" cols="50"></textarea>
+            <button id="ok-button">OK</button>
+            <button id="cancel-button">Відмінити</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const editText = document.getElementById('edit-text').value;
+        fetch(`/edit/${itemId}`, {
+            method: 'POST',
+            body: JSON.stringify({ text: editText }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems();
+            } else {
+                console.error('Failed to edit item');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
+}
+
+function addSubject(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <textarea id="add-text" rows="4" cols="50"></textarea>
+            <button id="add-ok-button">OK</button>
+            <button id="add-cancel-button">Відмінити</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#add-ok-button');
+    const cancelButton = modal.querySelector('#add-cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const addText = document.getElementById('add-text').value;
+        fetch(`/addSubject/${itemId}`, {
+            method: 'POST',
+            body: JSON.stringify({ text: addText }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems();
+            } else {
+                console.error('Failed to add subject');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
+}
+

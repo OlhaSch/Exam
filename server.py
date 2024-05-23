@@ -102,6 +102,23 @@ def get_section(item_id):
     print("Fetched sections:", sections)
     return jsonify(sections)
 
+@post_routes.route('/test_structure/units/<int:item_id>', methods=['GET'])
+def get_unit(item_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM unit WHERE id_section = %s", (item_id,))
+    columns = [column[0] for column in cursor.description]
+    units = []
+    for row in cursor.fetchall():
+        unit = dict(zip(columns, row))
+        unit['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
+        unit['edit_url'] = '/static/images/pen.png'
+        unit['add_url'] = '/static/images/add.png'
+        units.append(unit)
+    conn.close()
+    print("Fetched units:", units)
+    return jsonify(units)
+
 @post_routes.route('/delete/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
     try:
@@ -169,6 +186,58 @@ def add_subject():
         cursor.close()
         print("max ind:", max_id)
         return jsonify({"message": "Subject added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/deleteSection/<int:item_id>', methods=['POST'])
+def deleteSection(item_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM section WHERE id = %s", (item_id,))
+        item = cursor.fetchone()
+        if item is None:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Item not found"}), 404
+
+        cursor.execute("DELETE FROM section WHERE id = %s", (item_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return '', 204
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+@post_routes.route('/editSection/<int:item_id>', methods=['POST'])
+def editSection(item_id):
+    try:
+        new_text = request.json['text']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE section SET section = %s WHERE id = %s", (new_text, item_id))
+        conn.commit()
+        conn.close()
+        cursor.close()
+        return '', 204
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/addSection/<int:item_id>', methods=['POST'])
+def addSection(item_id):
+    try:
+        new_text = request.json['text']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM section")
+        max_id = cursor.fetchone()[0]
+        new_id = (max_id + 1) if max_id else 1
+        cursor.execute('INSERT INTO section (id, section, id_subject) VALUES (%s, %s, %s)', (new_id, new_text, item_id))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Section added successfully"}), 200
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
