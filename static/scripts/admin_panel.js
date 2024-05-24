@@ -262,9 +262,8 @@ function loadMaterial(unitId, parentLi) {
 
     options.forEach((option, index) => {
         const li = document.createElement('li');
-        li.classList.add('material-item'); // Add class for styling
+        li.classList.add('material-item');
         li.textContent = option;
-        li.style.cursor = 'pointer';
 
         li.addEventListener('click', function(event) {
             event.stopPropagation();
@@ -272,7 +271,6 @@ function loadMaterial(unitId, parentLi) {
             if (index === 0) {
                 console.log('Тест обраний');
                 loadTest(unitId, li);
-                console.log('loading Tests is success');
             } else if (index === 1) {
                 console.log('Матеріали обрані');
                 loadTheory(unitId, li);
@@ -293,42 +291,40 @@ function loadTest(unitId, parentLi) {
     fetch(`/units_structure/test/${unitId}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Test data:", data);
-
             const ul = document.createElement('ul');
             ul.classList.add('test-list');
 
             data.forEach(test => {
                 const li = document.createElement('li');
-                li.classList.add('test-item'); // Add class for styling
+                li.classList.add('test-item');
                 li.textContent = `Test ID: ${test.id}`;
-                li.style.cursor = 'pointer';
+
+                const imgContainer = document.createElement('div');
+                imgContainer.classList.add('img-container');
 
                 const imgDelete = document.createElement('img');
                 imgDelete.src = test.image_url;
                 imgDelete.alt = 'Delete';
                 imgDelete.width = 15;
                 imgDelete.height = 15;
-                imgDelete.style.cursor = 'pointer';
 
                 const imgEdit = document.createElement('img');
                 imgEdit.src = test.edit_url;
                 imgEdit.alt = 'Edit';
                 imgEdit.width = 15;
                 imgEdit.height = 15;
-                imgEdit.style.cursor = 'pointer';
 
                 const imgAdd = document.createElement('img');
                 imgAdd.src = test.add_url;
                 imgAdd.alt = 'Add';
                 imgAdd.width = 15;
                 imgAdd.height = 15;
-                imgAdd.style.cursor = 'pointer';
 
-                li.appendChild(imgDelete);
-                li.appendChild(imgEdit);
-                li.appendChild(imgAdd);
+                imgContainer.appendChild(imgDelete);
+                imgContainer.appendChild(imgEdit);
+                imgContainer.appendChild(imgAdd);
 
+                li.appendChild(imgContainer);
                 ul.appendChild(li);
 
                 imgDelete.addEventListener('click', function(event) {
@@ -371,49 +367,46 @@ function loadTest(unitId, parentLi) {
 }
 
 function loadTheory(unitId, parentLi) {
-    console.log('Load Theory');
     if (parentLi.classList.contains('loaded')) {
         return;
     }
     fetch(`/units_structure/theory/${unitId}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Theory data:", data);
-
             const ul = document.createElement('ul');
-            ul.classList.add('theory-list'); // Changed class for clarity
+            ul.classList.add('theory-list');
 
             data.forEach(theory => {
                 const li = document.createElement('li');
-                li.classList.add('theory-item'); // Add class for styling
-                li.textContent = `Material ID: ${theory.id}`;
-                li.style.cursor = 'pointer';
+                li.classList.add('theory-item');
+                li.textContent = `${theory.title}`;
+
+                const imgContainer = document.createElement('div');
+                imgContainer.classList.add('img-container');
 
                 const imgDelete = document.createElement('img');
                 imgDelete.src = theory.image_url;
                 imgDelete.alt = 'Delete';
                 imgDelete.width = 15;
                 imgDelete.height = 15;
-                imgDelete.style.cursor = 'pointer';
 
                 const imgEdit = document.createElement('img');
                 imgEdit.src = theory.edit_url;
                 imgEdit.alt = 'Edit';
                 imgEdit.width = 15;
                 imgEdit.height = 15;
-                imgEdit.style.cursor = 'pointer';
 
                 const imgAdd = document.createElement('img');
                 imgAdd.src = theory.add_url;
                 imgAdd.alt = 'Add';
                 imgAdd.width = 15;
                 imgAdd.height = 15;
-                imgAdd.style.cursor = 'pointer';
 
-                li.appendChild(imgDelete);
-                li.appendChild(imgEdit);
-                li.appendChild(imgAdd);
+                imgContainer.appendChild(imgDelete);
+                imgContainer.appendChild(imgEdit);
+                imgContainer.appendChild(imgAdd);
 
+                li.appendChild(imgContainer);
                 ul.appendChild(li);
 
                 imgDelete.addEventListener('click', function(event) {
@@ -458,6 +451,7 @@ function loadTheory(unitId, parentLi) {
 document.addEventListener('DOMContentLoaded', function() {
     loadItems();
 });
+
 
 
 
@@ -530,6 +524,44 @@ function createModal(itemId) {
         modal.remove();
     });
 }
+function createSubjectModal(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <textarea id="edit-text" rows="4" cols="50"></textarea>
+            <button id="ok-button">OK</button>
+            <button id="cancel-button">Відмінити</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const editText = document.getElementById('edit-text').value;
+        fetch(`/edit/${itemId}`, {
+            method: 'POST',
+            body: JSON.stringify({ text: editText }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems();
+            } else {
+                console.error('Failed to edit item');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
+}
+
 
 function addSubject(itemId) {
     const modal = document.createElement('div');
@@ -560,43 +592,6 @@ function addSubject(itemId) {
                 loadItems();
             } else {
                 console.error('Failed to add subject');
-            }
-        }).catch(error => console.error('Error:', error));
-    });
-
-    cancelButton.addEventListener('click', function() {
-        modal.remove();
-    });
-}
-function createSubjectModal(itemId) {
-    const modal = document.createElement('div');
-    modal.classList.add('modal');
-    modal.innerHTML = `
-        <div class="modal-content">
-            <textarea id="edit-text" rows="4" cols="50"></textarea>
-            <button id="ok-button">OK</button>
-            <button id="cancel-button">Відмінити</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    const okButton = modal.querySelector('#ok-button');
-    const cancelButton = modal.querySelector('#cancel-button');
-
-    okButton.addEventListener('click', function() {
-        const editText = document.getElementById('edit-text').value;
-        fetch(`/edit/${itemId}`, {
-            method: 'POST',
-            body: JSON.stringify({ text: editText }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                modal.remove();
-                loadItems();
-            } else {
-                console.error('Failed to edit item');
             }
         }).catch(error => console.error('Error:', error));
     });

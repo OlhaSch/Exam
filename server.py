@@ -183,8 +183,8 @@ def edit(item_id):
         cursor = conn.cursor()
         cursor.execute("UPDATE subject SET subject = %s WHERE id = %s", (new_text, item_id))
         conn.commit()
-        conn.close()
         cursor.close()
+        conn.close()
         return '', 204
     except Exception as e:
         print(f"Error: {e}")
