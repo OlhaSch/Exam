@@ -9,6 +9,12 @@ function loadItems() {
                 li.classList.add('subject-item'); // Додавання класу для стилізації
                 li.style.fontSize = '23px';
 
+                const textSpan = document.createElement('span');
+                textSpan.textContent = item.subject;
+
+                const imgContainer = document.createElement('div');
+                imgContainer.classList.add('img-container');
+
                 const imgDelete = document.createElement('img');
                 imgDelete.src = item.image_url;
                 imgDelete.alt = 'Delete';
@@ -30,10 +36,12 @@ function loadItems() {
                 imgAdd.height = 15;
                 imgAdd.style.cursor = 'pointer';
 
-                li.textContent = item.subject;
-                li.appendChild(imgDelete);
-                li.appendChild(imgEdit);
-                li.appendChild(imgAdd);
+                imgContainer.appendChild(imgDelete);
+                imgContainer.appendChild(imgEdit);
+                imgContainer.appendChild(imgAdd);
+
+                li.appendChild(textSpan);
+                li.appendChild(imgContainer);
                 li.style.cursor = 'pointer'; // Зміна курсору при наведенні на текст
                 ul.appendChild(li);
 
@@ -69,8 +77,6 @@ function loadItems() {
 }
 
 
-
-// Виправлено назву параметру на sectionId, оскільки це ідентифікатор секції
 function loadSections(itemId, parentLi) {
     if (parentLi.classList.contains('loaded')) {
         return;
@@ -79,13 +85,21 @@ function loadSections(itemId, parentLi) {
     fetch(`/test_structure/section/${itemId}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Sections data:", data);
+            let sectionContainer = parentLi.querySelector('.section-container');
+            if (sectionContainer) {
+                sectionContainer.innerHTML = ''; // Clear container before adding new sections
+            } else {
+                sectionContainer = document.createElement('div');
+                sectionContainer.classList.add('section-container');
+                parentLi.appendChild(sectionContainer);
+            }
+
             const ul = document.createElement('ul');
             ul.classList.add('section-list');
             data.forEach(section => {
                 const li = document.createElement('li');
+                li.classList.add('section-item');
                 li.textContent = section.section;
-                li.style.cursor = 'pointer';
 
                 const imgDelete = document.createElement('img');
                 imgDelete.src = section.image_url;
@@ -115,11 +129,9 @@ function loadSections(itemId, parentLi) {
                 ul.appendChild(li);
 
                 li.addEventListener('click', function() {
-                    loadUnits(section.id, li); // Використано section.id
-                    console.log('loading Units success');
+                    loadUnits(section.id, li);
                 });
 
-                // Додамо обробники подій для кнопок видалення, редагування та додавання
                 imgDelete.addEventListener('click', function(event) {
                     event.stopPropagation();
                     fetch(`/deleteSection/${section.id}`, { method: 'POST' })
@@ -143,17 +155,14 @@ function loadSections(itemId, parentLi) {
                     addUnits(section.id);
                 });
             });
-            parentLi.appendChild(ul);
+            sectionContainer.appendChild(ul);
             parentLi.classList.add('loaded');
         })
         .catch(error => console.error('Error:', error));
 }
 
-
-
-
-function loadUnits(sectionId, parentUl) {
-    if (parentUl.classList.contains('loaded')) {
+function loadUnits(sectionId, parentLi) {
+    if (parentLi.classList.contains('loaded')) {
         return;
     }
 
@@ -165,8 +174,14 @@ function loadUnits(sectionId, parentUl) {
             ul.classList.add('unit-list');
             data.forEach(unit => {
                 const li = document.createElement('li');
-                li.textContent = unit.unit;
-                li.style.cursor = 'pointer';
+                li.classList.add('unit-item'); // Add class for styling
+                li.style.fontSize = '16px'; // Set font size
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = unit.unit;
+
+                const imgContainer = document.createElement('div');
+                imgContainer.classList.add('img-container');
 
                 const imgDelete = document.createElement('img');
                 imgDelete.src = unit.image_url;
@@ -189,19 +204,46 @@ function loadUnits(sectionId, parentUl) {
                 imgAdd.height = 15;
                 imgAdd.style.cursor = 'pointer';
 
-                li.appendChild(imgDelete);
-                li.appendChild(imgEdit);
-                li.appendChild(imgAdd);
+                imgContainer.appendChild(imgDelete);
+                imgContainer.appendChild(imgEdit);
+                imgContainer.appendChild(imgAdd);
+
+                li.appendChild(textSpan);
+                li.appendChild(imgContainer); // Додаємо контейнер зображень після тексту
 
                 ul.appendChild(li);
 
-                li.addEventListener('click', function() {
-                    loadMaterial(unit.id, li); // Використано unit.id
+                li.addEventListener('click', function(event) {
+                    event.stopPropagation(); // Stop event propagation to avoid conflicts
+                    loadMaterial(unit.id, li);
                     console.log('Loading Materials is success');
                 });
+
+                imgDelete.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    fetch(`/deleteUnit/${unit.id}`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                li.remove();
+                            } else {
+                                console.error('Failed to delete unit');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+
+                imgEdit.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    editUnit(unit.id);
+                });
+
+                imgAdd.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    addMaterial(unit.id);
+                });
             });
-            parentUl.appendChild(ul);
-            parentUl.classList.add('loaded');
+            parentLi.appendChild(ul);
+            parentLi.classList.add('loaded');
         })
         .catch(error => console.error('Error:', error));
 }
@@ -214,34 +256,26 @@ function loadMaterial(unitId, parentLi) {
         return;
     }
 
-    // Створюємо варіанти "тест" і "матеріали"
     const options = ['Тест', 'Матеріали'];
-
-    // Створюємо список для варіантів
     const ul = document.createElement('ul');
     ul.classList.add('material-list');
 
-    // Додаємо кожен варіант до списку
     options.forEach((option, index) => {
         const li = document.createElement('li');
+        li.classList.add('material-item'); // Add class for styling
         li.textContent = option;
         li.style.cursor = 'pointer';
 
-        // Додамо обробник події для вибору варіанту
         li.addEventListener('click', function(event) {
-            event.stopPropagation(); // Зупиняємо подію відповідно до кліка, щоб не впливати на батьківський елемент
+            event.stopPropagation();
 
-            // Перевіряємо, який варіант було обрано
             if (index === 0) {
-                // Обрано "тест"
                 console.log('Тест обраний');
-                // Тут можна викликати функцію, яка завантажить тестові дані
                 loadTest(unitId, li);
                 console.log('loading Tests is success');
             } else if (index === 1) {
-                // Обрано "матеріали"
                 console.log('Матеріали обрані');
-                // Тут можна викликати функцію, яка завантажить матеріали
+                loadTheory(unitId, li);
             }
         });
 
@@ -252,13 +286,10 @@ function loadMaterial(unitId, parentLi) {
     parentLi.classList.add('loaded');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    loadItems();
-});
-
 function loadTest(unitId, parentLi) {
-    console.log('loadTest works');
-
+    if (parentLi.classList.contains('loaded')) {
+        return;
+    }
     fetch(`/units_structure/test/${unitId}`)
         .then(response => response.json())
         .then(data => {
@@ -269,6 +300,7 @@ function loadTest(unitId, parentLi) {
 
             data.forEach(test => {
                 const li = document.createElement('li');
+                li.classList.add('test-item'); // Add class for styling
                 li.textContent = `Test ID: ${test.id}`;
                 li.style.cursor = 'pointer';
 
@@ -324,7 +356,9 @@ function loadTest(unitId, parentLi) {
             });
 
             let testContainer = parentLi.querySelector('.test-container');
-            if (!testContainer) {
+            if (testContainer) {
+                testContainer.innerHTML = '';
+            } else {
                 testContainer = document.createElement('div');
                 testContainer.classList.add('test-container');
                 parentLi.appendChild(testContainer);
@@ -335,6 +369,96 @@ function loadTest(unitId, parentLi) {
         })
         .catch(error => console.error('Error:', error));
 }
+
+function loadTheory(unitId, parentLi) {
+    console.log('Load Theory');
+    if (parentLi.classList.contains('loaded')) {
+        return;
+    }
+    fetch(`/units_structure/theory/${unitId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Theory data:", data);
+
+            const ul = document.createElement('ul');
+            ul.classList.add('theory-list'); // Changed class for clarity
+
+            data.forEach(theory => {
+                const li = document.createElement('li');
+                li.classList.add('theory-item'); // Add class for styling
+                li.textContent = `Material ID: ${theory.id}`;
+                li.style.cursor = 'pointer';
+
+                const imgDelete = document.createElement('img');
+                imgDelete.src = theory.image_url;
+                imgDelete.alt = 'Delete';
+                imgDelete.width = 15;
+                imgDelete.height = 15;
+                imgDelete.style.cursor = 'pointer';
+
+                const imgEdit = document.createElement('img');
+                imgEdit.src = theory.edit_url;
+                imgEdit.alt = 'Edit';
+                imgEdit.width = 15;
+                imgEdit.height = 15;
+                imgEdit.style.cursor = 'pointer';
+
+                const imgAdd = document.createElement('img');
+                imgAdd.src = theory.add_url;
+                imgAdd.alt = 'Add';
+                imgAdd.width = 15;
+                imgAdd.height = 15;
+                imgAdd.style.cursor = 'pointer';
+
+                li.appendChild(imgDelete);
+                li.appendChild(imgEdit);
+                li.appendChild(imgAdd);
+
+                ul.appendChild(li);
+
+                imgDelete.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    fetch(`/deleteTheory/${theory.id}`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                li.remove();
+                            } else {
+                                console.error('Failed to delete theory');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+
+                imgEdit.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    editTheory(theory.id);
+                });
+
+                imgAdd.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    addSections(theory.id);
+                });
+            });
+
+            let theoryContainer = parentLi.querySelector('.theory-container');
+            if (theoryContainer) {
+                theoryContainer.innerHTML = '';
+            } else {
+                theoryContainer = document.createElement('div');
+                theoryContainer.classList.add('theory-container');
+                parentLi.appendChild(theoryContainer);
+            }
+
+            theoryContainer.appendChild(ul);
+            parentLi.classList.add('loaded');
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadItems();
+});
+
 
 
 

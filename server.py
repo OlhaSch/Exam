@@ -137,6 +137,23 @@ def get_test(item_id):
     print("Fetched tests:", tests)
     return jsonify(tests)
 
+@post_routes.route('/units_structure/theory/<int:item_id>')
+def get_theory(item_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM materials WHERE id_unit = %s", (item_id,))
+    columns = [column[0] for column in cursor.description]
+    theorys = []
+    print('get_test')
+    for row in cursor.fetchall():
+        theory = dict(zip(columns, row))
+        theory['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
+        theory['edit_url'] = '/static/images/pen.png'
+        theory['add_url'] = '/static/images/add.png'
+        theorys.append(theory)
+    conn.close()
+    print("Fetched tests:", theorys)
+    return jsonify(theorys)
 @post_routes.route('/delete/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
     try:
