@@ -175,7 +175,3 @@ ul.section-list li {
     font-size: 18px;
     cursor: pointer; /* Зміна курсору при наведенні на текст */
 }
-.subject-item {
-    font-size: 130px; /* Збільшуємо розмір шрифту для заголовків */
-}
-

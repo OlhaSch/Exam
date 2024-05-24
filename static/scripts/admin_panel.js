@@ -236,7 +236,7 @@ function loadMaterial(unitId, parentLi) {
                 // Обрано "тест"
                 console.log('Тест обраний');
                 // Тут можна викликати функцію, яка завантажить тестові дані
-                loadTest(unitId, parentLi);
+                loadTest(unitId, li);
                 console.log('loading Tests is success');
             } else if (index === 1) {
                 // Обрано "матеріали"
@@ -259,17 +259,14 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadTest(unitId, parentLi) {
     console.log('loadTest works');
 
-    // Fetch tests data for the given unit ID
     fetch(`/units_structure/test/${unitId}`)
         .then(response => response.json())
         .then(data => {
             console.log("Test data:", data);
 
-            // Create a new unordered list element for tests
             const ul = document.createElement('ul');
             ul.classList.add('test-list');
 
-            // Iterate through the received test data
             data.forEach(test => {
                 const li = document.createElement('li');
                 li.textContent = `Test ID: ${test.id}`;
@@ -302,7 +299,6 @@ function loadTest(unitId, parentLi) {
 
                 ul.appendChild(li);
 
-                // Add event listeners for the images
                 imgDelete.addEventListener('click', function(event) {
                     event.stopPropagation();
                     fetch(`/deleteTest/${test.id}`, { method: 'POST' })
@@ -327,7 +323,6 @@ function loadTest(unitId, parentLi) {
                 });
             });
 
-            // Find the test container within parentLi
             let testContainer = parentLi.querySelector('.test-container');
             if (!testContainer) {
                 testContainer = document.createElement('div');
@@ -335,12 +330,12 @@ function loadTest(unitId, parentLi) {
                 parentLi.appendChild(testContainer);
             }
 
-            // Append the tests list to the test container
             testContainer.appendChild(ul);
             parentLi.classList.add('loaded');
         })
         .catch(error => console.error('Error:', error));
 }
+
 
 
 
