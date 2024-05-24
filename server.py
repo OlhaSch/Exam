@@ -119,6 +119,22 @@ def get_unit(item_id):
     print("Fetched units:", units)
     return jsonify(units)
 
+@post_routes.route('/units_structure/test/<int:item_id>', methods=['GET'])
+def get_test(item_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM test WHERE id_unit = %s", (item_id,))
+    columns = [column[0] for column in cursor.description]
+    tests = []
+    for row in cursor.fetchall():
+        test = dict(zip(columns, row))
+        test['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
+        test['edit_url'] = '/static/images/pen.png'
+        test['add_url'] = '/static/images/add.png'
+        tests.append(test)
+    conn.close()
+    print("Fetched tests:", tests)
+    return jsonify(tests)
 @post_routes.route('/delete/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
     try:
