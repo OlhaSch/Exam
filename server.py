@@ -291,3 +291,24 @@ def editUnit(item_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/deleteUnit/<int:item_id>', methods=['POST'])
+def deleteUnit(item_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM unit WHERE id = %s", (item_id,))
+        item = cursor.fetchone()
+        if item is None:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Item not found"}), 404
+
+        cursor.execute("DELETE FROM unit WHERE id = %s", (item_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return '', 204
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500

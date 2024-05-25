@@ -197,16 +197,8 @@ function loadUnits(sectionId, parentLi) {
                 imgEdit.height = 15;
                 imgEdit.style.cursor = 'pointer';
 
-                const imgAdd = document.createElement('img');
-                imgAdd.src = unit.add_url;
-                imgAdd.alt = 'Add';
-                imgAdd.width = 15;
-                imgAdd.height = 15;
-                imgAdd.style.cursor = 'pointer';
-
                 imgContainer.appendChild(imgDelete);
                 imgContainer.appendChild(imgEdit);
-                imgContainer.appendChild(imgAdd);
 
                 li.appendChild(textSpan);
                 li.appendChild(imgContainer); // Додаємо контейнер зображень після тексту
@@ -236,11 +228,6 @@ function loadUnits(sectionId, parentLi) {
                     event.stopPropagation();
                     editUnit(unit.id);
                 });
-
-                imgAdd.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    addMaterial(unit.id);
-                });
             });
             parentLi.appendChild(ul);
             parentLi.classList.add('loaded');
@@ -256,22 +243,51 @@ function loadMaterial(unitId, parentLi) {
         return;
     }
 
-    const options = ['Тест', 'Матеріали'];
+    const options = [
+        { name: 'Тест', add_url: '/static/images/add.png' },
+        { name: 'Матеріали', add_url: '/static/images/add.png' }
+    ];
     const ul = document.createElement('ul');
     ul.classList.add('material-list');
 
-    options.forEach((option, index) => {
+    options.forEach((option) => {
         const li = document.createElement('li');
         li.classList.add('material-item');
-        li.textContent = option;
+        li.textContent = option.name;
+
+        // Додавання зображення
+        const imgAdd = document.createElement('img');
+        imgAdd.src = option.add_url;
+        imgAdd.alt = 'Add';
+        imgAdd.width = 15;
+        imgAdd.height = 15;
+        imgAdd.style.cursor = 'pointer';
+
+        // Обробник події для зображень біля "Тесту"
+        if (option.name === 'Тест') {
+            imgAdd.addEventListener('click', function(event) {
+                event.stopPropagation();
+                addTest(unitId);
+            });
+        }
+
+        // Обробник події для зображень біля "Матеріалів"
+        if (option.name === 'Матеріали') {
+            imgAdd.addEventListener('click', function(event) {
+                event.stopPropagation();
+                addMaterial(unitId);
+            });
+        }
+
+        li.appendChild(imgAdd);
 
         li.addEventListener('click', function(event) {
             event.stopPropagation();
 
-            if (index === 0) {
+            if (option.name === 'Тест') {
                 console.log('Тест обраний');
                 loadTest(unitId, li);
-            } else if (index === 1) {
+            } else if (option.name === 'Матеріали') {
                 console.log('Матеріали обрані');
                 loadTheory(unitId, li);
             }
@@ -283,6 +299,8 @@ function loadMaterial(unitId, parentLi) {
     parentLi.appendChild(ul);
     parentLi.classList.add('loaded');
 }
+
+
 
 function loadTest(unitId, parentLi) {
     if (parentLi.classList.contains('loaded')) {
@@ -631,6 +649,88 @@ function editSection(itemId) {
     okButton.addEventListener('click', function() {
         const addText = document.getElementById('add-text').value;
         fetch(`/editSection/${itemId}`, { // Динамічний шлях з itemId
+            method: 'POST',
+            body: JSON.stringify({ text: addText }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems();
+            } else {
+                console.error('Failed to add section');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
+}
+
+function editUnit(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Редагувати підпункт</h2>
+            <textarea id="add-text" rows="4" cols="50"></textarea>
+            <div class="modal-buttons">
+                <button id="ok-button" class="button">OK</button>
+                <button id="cancel-button" class="button cancel">Відмінити</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const addText = document.getElementById('add-text').value;
+        fetch(`/editUnit/${itemId}`, { // Динамічний шлях з itemId
+            method: 'POST',
+            body: JSON.stringify({ text: addText }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems();
+            } else {
+                console.error('Failed to add section');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
+}
+
+function addTest(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Додати новий Тест</h2>
+            <textarea id="add-text" rows="4" cols="50"></textarea>
+            <div class="modal-buttons">
+                <button id="ok-button" class="button">OK</button>
+                <button id="cancel-button" class="button cancel">Відмінити</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const addText = document.getElementById('add-text').value;
+        fetch(`/addUnit/${itemId}`, { // Динамічний шлях з itemId
             method: 'POST',
             body: JSON.stringify({ text: addText }),
             headers: {
