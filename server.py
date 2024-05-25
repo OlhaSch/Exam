@@ -259,3 +259,35 @@ def addSection(item_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/addUnit/<int:item_id>', methods=['POST'])
+def addUnit(item_id):
+    try:
+        new_text = request.json['text']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM unit")
+        max_id = cursor.fetchone()[0]
+        new_id = (max_id + 1) if max_id else 1
+        cursor.execute('INSERT INTO unit (id, unit, id_section) VALUES (%s, %s, %s)', (new_id, new_text, item_id))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Unit added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/editUnit/<int:item_id>', methods=['POST'])
+def editUnit(item_id):
+    try:
+        new_text = request.json['text']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE unit SET unit = %s WHERE id = %s", (new_text, item_id))
+        conn.commit()
+        conn.close()
+        cursor.close()
+        return '', 204
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500

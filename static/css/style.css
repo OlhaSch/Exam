@@ -1,7 +1,7 @@
 /* Загальні стилі */
 body {
-    font-family: 'Roboto', sans-serif; /* Використовуйте сучасний шрифт */
-    background-color: #f5f5f5; /* Загальний фон */
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f5f5;
 }
 
 .container {
@@ -24,7 +24,7 @@ body {
 
 .parallax-content {
     padding: 100px 0;
-    color: #fff; /* Колір тексту контенту */
+    color: #fff;
 }
 
 /* Форми та введення */
@@ -44,7 +44,7 @@ input, textarea {
 
 input:focus, textarea:focus {
     border-color: #0056b3;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Додайте тінь при фокусі */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 form {
@@ -53,7 +53,7 @@ form {
     padding: 20px;
     background-color: #fff;
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Змініть тінь для форм */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Кнопки */
@@ -71,7 +71,7 @@ form {
 
 .button:hover {
     background-color: #0056b3;
-    transform: translateY(-2px); /* Легкий ефект підняття при наведенні */
+    transform: translateY(-2px);
 }
 
 /* Чекбокс */
@@ -79,7 +79,7 @@ form {
     display: inline-block;
     margin-right: 10px;
     cursor: pointer;
-    position: relative; /* Забезпечте можливість зміни стилів ::after */
+    position: relative;
 }
 
 .checkbox:checked::after {
@@ -90,7 +90,7 @@ form {
     transform: translate(-50%, -50%);
     width: 10px;
     height: 10px;
-    border-radius: 50%; /* Зробіть галочку круглою */
+    border-radius: 50%;
     background-color: #007bff;
 }
 
@@ -137,68 +137,39 @@ li {
     transform: scale(1.05);
 }
 
-/* Загальні стилі */
-#items-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
 
+
+
+
+
+
+
+
+/* Загальні стилі */
 .subject-item {
-    display: flex;
-    align-items: center;
+    position: relative;
     padding: 10px;
-    background-color: #f5f5f5;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer; /* Зміна курсору при наведенні */
 }
 
 .subject-item:hover {
-    background-color: #e0e0e0;
-}
-
-.subject-item img {
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-.subject-item img:hover {
-    opacity: 0.8;
-}
-
-.unit-list, .material-list, .test-list, .theory-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.unit-item, .material-item, .test-item, .theory-item {
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    border-bottom: 1px solid #ddd;
-    cursor: pointer;
-}
-
-.unit-item img, .material-item img, .test-item img, .theory-item img {
-    margin-left: 10px;
-}
-
-.unit-item:hover, .material-item:hover, .test-item:hover, .theory-item:hover {
     background-color: #f0f0f0;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
+.img-container {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
 }
 
-li {
-    margin: 5px 0;
+.expandable-content {
+    display: none;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ddd;
+    margin-left: 20px;
 }
 
 .subject-item, .section-item, .unit-item, .material-item, .test-item, .theory-item {
@@ -213,7 +184,6 @@ li {
     transition: background-color 0.3s ease, transform 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .subject-item:hover, .section-item:hover, .unit-item:hover, .material-item:hover, .test-item:hover, .theory-item:hover {
     background-color: #e0e0e0;
     transform: translateY(-2px);
@@ -240,4 +210,37 @@ li {
 
 .test-container, .theory-container {
     margin-top: 10px;
+}
+
+.expandable-list {
+    list-style: none;
+    padding: 0;
+}
+
+.expandable-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+}
+
+.expandable-item .img-container {
+    display: flex;
+    gap: 5px;
+}
+
+.expandable-item img {
+    width: 15px;
+    height: 15px;
+}
+
+.expandable-content {
+    display: none;
+    padding-left: 20px;
+}
+
+.expandable-item.open .expandable-content {
+    display: block;
 }

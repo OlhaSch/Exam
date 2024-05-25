@@ -152,7 +152,7 @@ function loadSections(itemId, parentLi) {
 
                 imgAdd.addEventListener('click', function(event) {
                     event.stopPropagation();
-                    addUnits(section.id);
+                    addUnit(section.id);
                 });
             });
             sectionContainer.appendChild(ul);
@@ -549,6 +549,88 @@ function addSection(itemId) {
     okButton.addEventListener('click', function() {
         const addText = document.getElementById('add-text').value;
         fetch(`/addSection/${itemId}`, { // Динамічний шлях з itemId
+            method: 'POST',
+            body: JSON.stringify({ text: addText }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems();
+            } else {
+                console.error('Failed to add section');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
+}
+
+function addUnit(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Додати новий підпункт</h2>
+            <textarea id="add-text" rows="4" cols="50"></textarea>
+            <div class="modal-buttons">
+                <button id="ok-button" class="button">OK</button>
+                <button id="cancel-button" class="button cancel">Відмінити</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const addText = document.getElementById('add-text').value;
+        fetch(`/addUnit/${itemId}`, { // Динамічний шлях з itemId
+            method: 'POST',
+            body: JSON.stringify({ text: addText }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems();
+            } else {
+                console.error('Failed to add section');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
+}
+
+function editSection(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Редагувати розділ</h2>
+            <textarea id="add-text" rows="4" cols="50"></textarea>
+            <div class="modal-buttons">
+                <button id="ok-button" class="button">OK</button>
+                <button id="cancel-button" class="button cancel">Відмінити</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const addText = document.getElementById('add-text').value;
+        fetch(`/editSection/${itemId}`, { // Динамічний шлях з itemId
             method: 'POST',
             body: JSON.stringify({ text: addText }),
             headers: {
