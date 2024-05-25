@@ -312,3 +312,34 @@ def deleteUnit(item_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@post_routes.route('/addTest/<int:item_id>', methods=['POST'])
+def addTest(item_id):
+    try:
+        data = request.json
+        question = data['question']
+        option1 = data['option1']
+        option2 = data['option2']
+        option3 = data['option3']
+        option4 = data['option4']
+        answer = data['correct-answer']
+        solution = data['solution']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM test")
+        max_id = cursor.fetchone()[0]
+        new_id = (max_id + 1) if max_id else 1
+
+        cursor.execute(
+            'INSERT INTO test (id, id_unit, question, answer, choice1, choice2, choice3, choice4, description) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+            (new_id, item_id, question, answer, option1, option2, option3, option4, solution))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Test added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500

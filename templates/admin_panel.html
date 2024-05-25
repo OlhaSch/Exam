@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Нове повідомлення</title>
     <style>
         body {
             margin: 0;
@@ -13,35 +10,17 @@
             background-color: #FAFAFA;
             font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
             color: #333333;
-            position: relative;
-        }
-
-        .background-shape {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 200px;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 50%;
-            animation: moveBackground 30s linear infinite;
-        }
-
-        @keyframes moveBackground {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1.5);
-            }
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            position: relative;
             width: 100%;
-            max-width: 60%;
-            margin: auto;
-            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 40px;
             background-color: #FFFFFF;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -49,106 +28,114 @@
 
         .logo img {
             width: 100%;
-            max-width: 100%;
+            max-width: 300px; /* Збільшено розмір логотипу */
             display: block;
-            margin: auto;
-            border: 0;
-            outline: none;
-            text-decoration: none;
+            margin: 0 auto 20px auto;
         }
 
-        .button-wrapper {
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        .button-wrapper button {
-            color: #FFFFFF;
-            font-size: 14px;
-            padding: 10px 20px;
-            background: #000000;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .button-wrapper button:hover {
-            background-color: #FFFFFF;
-            color: #000000;
-        }
-        .button.cancel {
-            background: #6c757d;
-        }
-
-        .button.cancel:hover {
-            background: #5a6268;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #CCCCCC;
-            background-color: #FFFFFF;
-            color: #333333;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" stroke="%23333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><path d="M1 3.5l4 4 4-4"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 12px;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 20px; /* Add margin-bottom for spacing */
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #000000;
-        }
-
-        #items-list, .section-list {
+        #items-list {
             list-style-type: none;
             padding: 0;
             margin: 0;
         }
 
- .subject-item, .section-item, .unit-item, .material-item, .test-item, .theory-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #ffffff;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        .subject-item, .section-item, .unit-item, .material-item, .test-item, .theory-item {
+            display: block;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
+        .subject-item:hover, .section-item:hover, .unit-item:hover, .material-item:hover, .test-item:hover, .theory-item:hover {
+            background-color: #f1f1f1;
+        }
 
-.subject-item span, .section-item span, .unit-item span, .material-item span, .test-item span, .theory-item span {
-    font-size: 18px;
-    flex-grow: 1;
-}
+        .img-container {
+            display: flex;
+            gap: 10px;
+        }
 
-.subject-item .img-container, .section-item .img-container, .unit-item .img-container, .material-item .img-container, .test-item .img-container, .theory-item .img-container {
-    display: flex;
-    gap: 10px;
-}
+        .expandable-content {
+            display: none;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-top: 1px solid #ddd;
+            margin-left: 20px;
+            flex-direction: column;
+        }
 
-.subject-item img, .section-item img, .unit-item img, .material-item img, .test-item img, .theory-item img {
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-}
+        .subject-item.open .expandable-content {
+            display: block;
+        }
 
-.subject-item img:hover, .section-item img:hover, .unit-item img:hover, .material-item img:hover, .test-item img:hover, .theory-item img:hover {
-    opacity: 0.8;
-}
+     .button-wrapper {
+        display: inline-block;
+        margin-top: 20px;
+    }
 
-.test-container, .theory-container {
-    margin-top: 10px;
-}
- .modal {
+    .button-wrapper button {
+        color: #FFFFFF;
+        font-size: 14px;
+        padding: 10px 20px;
+        background: #000000;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .button-wrapper button:hover {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .button.cancel {
+        background: #6c757d;
+    }
+
+    .button.cancel:hover {
+        background: #5a6268;
+    }
+
+    .subject-item, .section-item, .unit-item, .material-item, .test-item, .theory-item {
+        display: block; /* Використовуємо flex для основного контейнера */
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        position: relative;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .subject-item span {
+        flex-grow: 1; /* Додано для розтягування тексту */
+    }
+
+    .img-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    .expandable-content {
+        display: none;
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-top: 1px solid #ddd;
+        margin-left: 20px;
+        flex-direction: column; /* Додано для вертикального відображення */
+    }
+
+    .subject-item.open .expandable-content {
+        display: block;
+    }
+
+    .modal {
         position: fixed;
         top: 0;
         left: 0;
@@ -157,11 +144,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0, 0, 0, 0.7); /* Темний фон з прозорістю */
+        background: rgba(0, 0, 0, 0.7);
         z-index: 1000;
     }
 
-    /* Вміст модального вікна */
     .modal-content {
         background: #fff;
         padding: 20px;
@@ -184,7 +170,6 @@
         }
     }
 
-    /* Заголовок модального вікна */
     .modal-content h2 {
         font-size: 24px;
         margin-bottom: 20px;
@@ -193,7 +178,6 @@
         color: #000;
     }
 
-    /* Поле для редагування */
     .modal-content textarea {
         width: 100%;
         padding: 10px;
@@ -202,15 +186,14 @@
         font-size: 16px;
         box-sizing: border-box;
         margin-bottom: 20px;
-        resize: none; /* Заборонити зміну розміру */
+        resize: none;
     }
 
-    /* Контейнер для кнопок */
     .modal-buttons {
         display: flex;
         justify-content: space-between;
     }
- /* Стиль кнопок */
+
     .button {
         padding: 10px 20px;
         border: none;
@@ -235,11 +218,9 @@
     .button.cancel:hover {
         background: #5a6268;
     }
-
     </style>
 </head>
 <body>
-<div class="background-shape"></div>
 <div class="container">
     <div class="logo">
         <img src="static/images/1.jpg" alt="Logo">
@@ -272,6 +253,10 @@
     <p>Our mailing address is: 1234 Street Rd., City, Country</p>
     <p><a href="" target="_blank">Unsubscribe</a></p>
 </div>
+
+<script src="static/scripts/admin_panel.js"></script>
+</body>
+</html>
 
 <script src="static/scripts/admin_panel.js"></script>
 </body>

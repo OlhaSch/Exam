@@ -46,6 +46,7 @@ function loadItems() {
                 ul.appendChild(li);
 
                 li.addEventListener('click', function() {
+                    li.classList.toggle('open');
                     loadSections(item.id, li);
                 });
 
@@ -75,7 +76,6 @@ function loadItems() {
         })
         .catch(error => console.error('Error:', error));
 }
-
 
 function loadSections(itemId, parentLi) {
     if (parentLi.classList.contains('loaded')) {
@@ -470,8 +470,11 @@ document.addEventListener('DOMContentLoaded', function() {
     loadItems();
 });
 
-
-
+document.addEventListener('click', function(event) {
+    if (event.target && event.target.classList.contains('subject-item')) {
+        event.target.querySelector('.expandable-content').classList.toggle('open');
+    }
+});
 
 
 
@@ -713,39 +716,76 @@ function editUnit(itemId) {
 function addTest(itemId) {
     const modal = document.createElement('div');
     modal.classList.add('modal');
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h2>Додати новий Тест</h2>
-            <textarea id="add-text" rows="4" cols="50"></textarea>
-            <div class="modal-buttons">
-                <button id="ok-button" class="button">OK</button>
-                <button id="cancel-button" class="button cancel">Відмінити</button>
-            </div>
+modal.innerHTML = `
+    <div class="modal-content">
+        <h2>Додати новий Тест</h2>
+        <label for="question">Питання:</label>
+        <textarea id="question" rows="4" cols="50" style="margin-top: 10px; margin-bottom: 10px;"></textarea>
+
+        <label for="option1" style="margin-top: 10px;">Варіант відповіді 1:</label>
+        <input type="text" id="option1" style="margin-bottom: 10px; display: block;"><br>
+
+        <label for="option2">Варіант відповіді 2:</label>
+        <input type="text" id="option2" style="margin-bottom: 10px; display: block;"><br>
+
+        <label for="option3">Варіант відповіді 3:</label>
+        <input type="text" id="option3" style="margin-bottom: 10px; display: block;"><br>
+
+        <label for="option4">Варіант відповіді 4:</label>
+        <input type="text" id="option4" style="margin-bottom: 10px; display: block;"><br>
+
+        <label for="correct-answer">Правильна відповідь:</label>
+        <input type="text" id="correct-answer" style="margin-bottom: 10px; display: block;"><br>
+
+        <label for="solution">Опис рішення:</label>
+        <textarea id="solution" rows="4" cols="50" style="margin-top: 10px; margin-bottom: 10px;"></textarea>
+
+        <div class="modal-buttons">
+            <button id="ok-button" class="button">OK</button>
+            <button id="cancel-button" class="button cancel">Відмінити</button>
         </div>
-    `;
+    </div>
+`;
+
+
+
     document.body.appendChild(modal);
 
     const okButton = modal.querySelector('#ok-button');
     const cancelButton = modal.querySelector('#cancel-button');
 
-    okButton.addEventListener('click', function() {
-        const addText = document.getElementById('add-text').value;
-        fetch(`/addUnit/${itemId}`, { // Динамічний шлях з itemId
-            method: 'POST',
-            body: JSON.stringify({ text: addText }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                modal.remove();
-                loadItems();
-            } else {
-                console.error('Failed to add section');
-            }
-        }).catch(error => console.error('Error:', error));
-    });
+okButton.addEventListener('click', function() {
+    const questionValue = document.getElementById('question').value;
+    const option1Value = document.getElementById('option1').value;
+    const option2Value = document.getElementById('option2').value;
+    const option3Value = document.getElementById('option3').value;
+    const option4Value = document.getElementById('option4').value;
+    const correctAnswerValue = document.getElementById('correct-answer').value;
+    const solutionValue = document.getElementById('solution').value;
 
+    fetch(`/addTest/${itemId}`, {
+        method: 'POST',
+        body: JSON.stringify({
+            question: questionValue,
+            option1: option1Value,
+            option2: option2Value,
+            option3: option3Value,
+            option4: option4Value,
+            "correct-answer": correctAnswerValue,
+            solution: solutionValue
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (response.ok) {
+            modal.remove();
+            loadItems();
+        } else {
+            console.error('Failed to add section');
+        }
+    }).catch(error => console.error('Error:', error));
+});
     cancelButton.addEventListener('click', function() {
         modal.remove();
     });
