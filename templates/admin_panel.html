@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +16,25 @@
             position: relative;
         }
 
-        /* Додаткові стилі для сторінки тут */
+        .background-shape {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 50%;
+            animation: moveBackground 30s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+        }
 
         .container {
             position: relative;
@@ -59,6 +77,13 @@
             background-color: #FFFFFF;
             color: #000000;
         }
+        .button.cancel {
+            background: #6c757d;
+        }
+
+        .button.cancel:hover {
+            background: #5a6268;
+        }
 
         select {
             width: 100%;
@@ -76,7 +101,7 @@
             background-size: 12px;
             font-size: 14px;
             line-height: 1.5;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* Add margin-bottom for spacing */
         }
 
         select:focus {
@@ -90,71 +115,164 @@
             margin: 0;
         }
 
-        .subject-item, .section-item, .unit-item, .material-item, .test-item, .theory-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #ffffff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+ .subject-item, .section-item, .unit-item, .material-item, .test-item, .theory-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-        .subject-item span, .section-item span, .unit-item span, .material-item span, .test-item span, .theory-item span {
-            font-size: 18px;
-            flex-grow: 1;
-        }
 
-        .subject-item .img-container, .section-item .img-container, .unit-item .img-container, .material-item .img-container, .test-item .img-container, .theory-item .img-container {
-            display: flex;
-            gap: 10px;
-        }
+.subject-item span, .section-item span, .unit-item span, .material-item span, .test-item span, .theory-item span {
+    font-size: 18px;
+    flex-grow: 1;
+}
 
-        .subject-item img, .section-item img, .unit-item img, .material-item img, .test-item img, .theory-item img {
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-        }
+.subject-item .img-container, .section-item .img-container, .unit-item .img-container, .material-item .img-container, .test-item .img-container, .theory-item .img-container {
+    display: flex;
+    gap: 10px;
+}
 
-        .subject-item img:hover, .section-item img:hover, .unit-item img:hover, .material-item img:hover, .test-item img:hover, .theory-item img:hover {
-            opacity: 0.8;
-        }
+.subject-item img, .section-item img, .unit-item img, .material-item img, .test-item img, .theory-item img {
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
 
-        .test-container, .theory-container {
-            margin-top: 10px;
+.subject-item img:hover, .section-item img:hover, .unit-item img:hover, .material-item img:hover, .test-item img:hover, .theory-item img:hover {
+    opacity: 0.8;
+}
+
+.test-container, .theory-container {
+    margin-top: 10px;
+}
+ .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.7); /* Темний фон з прозорістю */
+        z-index: 1000;
+    }
+
+    /* Вміст модального вікна */
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+        box-sizing: border-box;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
         }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Заголовок модального вікна */
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        text-align: center;
+        color: #000;
+    }
+
+    /* Поле для редагування */
+    .modal-content textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        box-sizing: border-box;
+        margin-bottom: 20px;
+        resize: none; /* Заборонити зміну розміру */
+    }
+
+    /* Контейнер для кнопок */
+    .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+    }
+ /* Стиль кнопок */
+    .button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background: #007BFF;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        width: 48%;
+        text-align: center;
+    }
+
+    .button:hover {
+        background: #0056b3;
+    }
+
+    .button.cancel {
+        background: #6c757d;
+    }
+
+    .button.cancel:hover {
+        background: #5a6268;
+    }
+
     </style>
 </head>
 <body>
-    <div class="background-shape"></div>
-    <div class="container">
-        <div class="logo">
-            <img src="static/images/1.jpg" alt="Logo">
-        </div>
-        <ul id="items-list">
-            <!-- List items will be added here dynamically -->
-        </ul>
-        <form id="addSubjectForm" method="POST" action="/addSubject">
-            <div class="button-wrapper">
-                <button id="addSubjectButton" type="submit">
-                    Додати предмет
-                </button>
-            </div>
-        </form>
+<div class="background-shape"></div>
+<div class="container">
+    <div class="logo">
+        <img src="static/images/1.jpg" alt="Logo">
     </div>
-
-    <div class="es-footer" style="text-align:center;margin-top:20px;">
-        <div class="social-icons">
-            <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/facebook-logo-black.png" alt="Facebook">
-            <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/x-logo-black.png" alt="X.com">
-            <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/instagram-logo-black.png" alt="Instagram">
-            <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/youtube-logo-black.png" alt="Youtube">
+    <ul id="items-list">
+        <!-- List items will be added here dynamically -->
+    </ul>
+    <form id="addSubjectForm" method="POST" action="/addSubject">
+        <div class="button-wrapper">
+            <button id="addSubjectButton" type="submit">
+                Додати предмет
+            </button>
         </div>
-        <p>Style Casual © 2024 Style Casual, Inc. All Rights Reserved.</p>
-        <p>You are receiving this email because you opted in via our website.</p>
-        <p>Our mailing address is: 1234 Street Rd., City, Country</p>
-        <p><a href="" target="_blank">Unsubscribe</a></p>
-    </div>
+    </form>
+</div>
 
-    <script src="static/scripts/admin_panel.js"></script>
+<div class="es-footer" style="text-align:center;margin-top:20px;">
+    <div class="social-icons">
+        <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/facebook-logo-black.png"
+             alt="Facebook">
+        <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/x-logo-black.png"
+             alt="X.com">
+        <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/instagram-logo-black.png"
+             alt="Instagram">
+        <img src="https://ehubiql.stripocdn.email/content/assets/img/social-icons/logo-black/youtube-logo-black.png"
+             alt="Youtube">
+    </div>
+    <p>Style Casual © 2024 Style Casual, Inc. All Rights Reserved.</p>
+    <p>You are receiving this email because you opted in via our website.</p>
+    <p>Our mailing address is: 1234 Street Rd., City, Country</p>
+    <p><a href="" target="_blank">Unsubscribe</a></p>
+</div>
+
+<script src="static/scripts/admin_panel.js"></script>
 </body>
 </html>

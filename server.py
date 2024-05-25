@@ -190,23 +190,6 @@ def edit(item_id):
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
 
-@post_routes.route('/addSubject/<int:item_id>', methods=['POST'])
-def addSubject(item_id):
-    try:
-        new_text = request.json['text']
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT MAX(id) FROM section")
-        max_id = cursor.fetchone()[0]
-        new_id = (max_id + 1) if max_id else 1
-        cursor.execute('INSERT INTO section (id, section, id_subject) VALUES (%s, %s, %s)', (new_id, new_text, item_id))
-        conn.commit()
-        conn.close()
-        return jsonify({"message": "Subject added successfully"}), 200
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": str(e)}), 500
-
 @post_routes.route('/addSubject', methods=['POST'])
 def add_subject():
     try:

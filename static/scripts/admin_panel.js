@@ -69,7 +69,7 @@ function loadItems() {
 
                 imgAdd.addEventListener('click', function(event) {
                     event.stopPropagation();
-                    addSubject(item.id);
+                    addSection(item.id);
                 });
             });
         })
@@ -486,52 +486,18 @@ document.getElementById('addSubjectButton').addEventListener('click', function(e
 });
 
 
-
+//редагувати предмет
 function createModal(itemId) {
     const modal = document.createElement('div');
     modal.classList.add('modal');
     modal.innerHTML = `
         <div class="modal-content">
+            <h2>Редагувати назву предмета</h2>
             <textarea id="edit-text" rows="4" cols="50"></textarea>
-            <button id="ok-button">OK</button>
-            <button id="cancel-button">Відмінити</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    const okButton = modal.querySelector('#ok-button');
-    const cancelButton = modal.querySelector('#cancel-button');
-
-    okButton.addEventListener('click', function() {
-        const editText = document.getElementById('edit-text').value;
-        fetch(`/edit/${itemId}`, {
-            method: 'POST',
-            body: JSON.stringify({ text: editText }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                modal.remove();
-                loadItems();
-            } else {
-                console.error('Failed to edit item');
-            }
-        }).catch(error => console.error('Error:', error));
-    });
-
-    cancelButton.addEventListener('click', function() {
-        modal.remove();
-    });
-}
-function createSubjectModal(itemId) {
-    const modal = document.createElement('div');
-    modal.classList.add('modal');
-    modal.innerHTML = `
-        <div class="modal-content">
-            <textarea id="edit-text" rows="4" cols="50"></textarea>
-            <button id="ok-button">OK</button>
-            <button id="cancel-button">Відмінити</button>
+            <div class="modal-buttons">
+                <button id="ok-button" class="button">OK</button>
+                <button id="cancel-button" class="button cancel">Відмінити</button>
+            </div>
         </div>
     `;
     document.body.appendChild(modal);
@@ -562,25 +528,27 @@ function createSubjectModal(itemId) {
     });
 }
 
-
-function addSubject(itemId) {
+function addSection(itemId) {
     const modal = document.createElement('div');
     modal.classList.add('modal');
     modal.innerHTML = `
         <div class="modal-content">
+            <h2>Додати новий розділ</h2>
             <textarea id="add-text" rows="4" cols="50"></textarea>
-            <button id="add-ok-button">OK</button>
-            <button id="add-cancel-button">Відмінити</button>
+            <div class="modal-buttons">
+                <button id="ok-button" class="button">OK</button>
+                <button id="cancel-button" class="button cancel">Відмінити</button>
+            </div>
         </div>
     `;
     document.body.appendChild(modal);
 
-    const okButton = modal.querySelector('#add-ok-button');
-    const cancelButton = modal.querySelector('#add-cancel-button');
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
 
     okButton.addEventListener('click', function() {
         const addText = document.getElementById('add-text').value;
-        fetch(`/addSubject/${itemId}`, {
+        fetch(`/addSection/${itemId}`, { // Динамічний шлях з itemId
             method: 'POST',
             body: JSON.stringify({ text: addText }),
             headers: {
@@ -591,7 +559,7 @@ function addSubject(itemId) {
                 modal.remove();
                 loadItems();
             } else {
-                console.error('Failed to add subject');
+                console.error('Failed to add section');
             }
         }).catch(error => console.error('Error:', error));
     });
@@ -600,42 +568,3 @@ function addSubject(itemId) {
         modal.remove();
     });
 }
-
-function addSubject(itemId) {
-    const modal = document.createElement('div');
-    modal.classList.add('modal');
-    modal.innerHTML = `
-        <div class="modal-content">
-            <textarea id="add-text" rows="4" cols="50"></textarea>
-            <button id="add-ok-button">OK</button>
-            <button id="add-cancel-button">Відмінити</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    const okButton = modal.querySelector('#add-ok-button');
-    const cancelButton = modal.querySelector('#add-cancel-button');
-
-    okButton.addEventListener('click', function() {
-        const addText = document.getElementById('add-text').value;
-        fetch(`/addSubject/${itemId}`, {
-            method: 'POST',
-            body: JSON.stringify({ text: addText }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                modal.remove();
-                loadItems();
-            } else {
-                console.error('Failed to add subject');
-            }
-        }).catch(error => console.error('Error:', error));
-    });
-
-    cancelButton.addEventListener('click', function() {
-        modal.remove();
-    });
-}
-
