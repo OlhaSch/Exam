@@ -131,7 +131,6 @@ def get_test(item_id):
         test = dict(zip(columns, row))
         test['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
         test['edit_url'] = '/static/images/pen.png'
-        test['add_url'] = '/static/images/add.png'
         tests.append(test)
     conn.close()
     print("Fetched tests:", tests)
@@ -149,7 +148,6 @@ def get_theory(item_id):
         theory = dict(zip(columns, row))
         theory['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
         theory['edit_url'] = '/static/images/pen.png'
-        theory['add_url'] = '/static/images/add.png'
         theorys.append(theory)
     conn.close()
     print("Fetched tests:", theorys)

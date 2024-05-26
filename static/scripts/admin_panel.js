@@ -332,16 +332,9 @@ function loadTest(unitId, parentLi) {
                 imgEdit.width = 15;
                 imgEdit.height = 15;
 
-                const imgAdd = document.createElement('img');
-                imgAdd.src = test.add_url;
-                imgAdd.alt = 'Add';
-                imgAdd.width = 15;
-                imgAdd.height = 15;
 
                 imgContainer.appendChild(imgDelete);
                 imgContainer.appendChild(imgEdit);
-                imgContainer.appendChild(imgAdd);
-
                 li.appendChild(imgContainer);
                 ul.appendChild(li);
 
@@ -361,11 +354,6 @@ function loadTest(unitId, parentLi) {
                 imgEdit.addEventListener('click', function(event) {
                     event.stopPropagation();
                     editTest(test.id);
-                });
-
-                imgAdd.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    addSections(test.id);
                 });
             });
 
@@ -414,15 +402,8 @@ function loadTheory(unitId, parentLi) {
                 imgEdit.width = 15;
                 imgEdit.height = 15;
 
-                const imgAdd = document.createElement('img');
-                imgAdd.src = theory.add_url;
-                imgAdd.alt = 'Add';
-                imgAdd.width = 15;
-                imgAdd.height = 15;
-
                 imgContainer.appendChild(imgDelete);
                 imgContainer.appendChild(imgEdit);
-                imgContainer.appendChild(imgAdd);
 
                 li.appendChild(imgContainer);
                 ul.appendChild(li);
@@ -445,10 +426,6 @@ function loadTheory(unitId, parentLi) {
                     editTheory(theory.id);
                 });
 
-                imgAdd.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    addSections(theory.id);
-                });
             });
 
             let theoryContainer = parentLi.querySelector('.theory-container');
