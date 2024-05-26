@@ -409,3 +409,27 @@ def deleteTest(item_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/addMaterial/<int:item_id>', methods=['POST'])
+def addMaterial(item_id):
+    try:
+        data = request.json
+        title = data['title']
+        description = data['description']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM test")
+        max_id = cursor.fetchone()[0]
+        new_id = (max_id + 1) if max_id else 1
+        cursor.execute(
+            'INSERT INTO materials (id, id_unit, title, description) VALUES (%s, %s, %s, %s)',
+            (new_id, item_id, title, description))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Material added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500

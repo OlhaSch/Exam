@@ -275,7 +275,7 @@ function loadMaterial(unitId, parentLi) {
         if (option.name === 'Матеріали') {
             imgAdd.addEventListener('click', function(event) {
                 event.stopPropagation();
-                addMaterial(unitId);
+                addMaterials(unitId);
             });
         }
 
@@ -856,4 +856,56 @@ function editTest(itemId) {
             });
         })
         .catch(error => console.error('Error:', error));
+}
+
+function addMaterials(itemId) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Додати новий матеріал</h2>
+            <label for="title">Заголовок:</label>
+            <input type="text" id="title" style="margin-top: 10px; margin-bottom: 10px; display: block;"><br>
+
+            <label for="description">Опис:</label>
+            <textarea id="description" rows="4" cols="50" style="margin-top: 10px; margin-bottom: 10px;"></textarea>
+
+            <div class="modal-buttons">
+                <button id="ok-button" class="button">OK</button>
+                <button id="cancel-button" class="button cancel">Відмінити</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const okButton = modal.querySelector('#ok-button');
+    const cancelButton = modal.querySelector('#cancel-button');
+
+    okButton.addEventListener('click', function() {
+        const titleValue = document.getElementById('title').value;
+        const descriptionValue = document.getElementById('description').value;
+
+        fetch(`/addMaterial/${itemId}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                title: titleValue,
+                description: descriptionValue
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                modal.remove();
+                loadItems(); // Виклик функції для оновлення списку матеріалів
+            } else {
+                console.error('Failed to add material');
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    cancelButton.addEventListener('click', function() {
+        modal.remove();
+    });
 }
