@@ -136,6 +136,26 @@ def get_test(item_id):
     print("Fetched tests:", tests)
     return jsonify(tests)
 
+
+@post_routes.route('/units_structure/test_by_id/<int:item_id>', methods=['GET'])
+def get_test_one(item_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM test WHERE id = %s", (item_id,))
+    columns = [column[0] for column in cursor.description]
+    test = cursor.fetchone()
+    conn.close()
+
+    if test is None:
+        return jsonify([])  # Повернути порожній список, якщо тест не знайдено
+
+    test_dict = dict(zip(columns, test))
+    test_dict['image_url'] = '/static/images/delete.png'  # URL-адреса першого зображення
+    test_dict['edit_url'] = '/static/images/pen.png'
+
+    return jsonify([test_dict])
+
+
 @post_routes.route('/units_structure/theory/<int:item_id>')
 def get_theory(item_id):
     conn = get_db_connection()
@@ -338,6 +358,54 @@ def addTest(item_id):
         conn.close()
 
         return jsonify({"message": "Test added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/editTest/<int:item_id>', methods=['POST'])
+def editTest(item_id):
+    try:
+        data = request.json
+        question = data['question']
+        option1 = data['option1']
+        option2 = data['option2']
+        option3 = data['option3']
+        option4 = data['option4']
+        answer = data['correct_answer']
+        solution = data['solution']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            'UPDATE test SET question = %s, answer = %s, choice1 = %s, choice2 = %s, choice3 = %s, choice4 = %s, description = %s WHERE id = %s',
+            (question, answer, option1, option2, option3, option4, solution, item_id))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Test updated successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/deleteTest/<int:item_id>', methods=['POST'])
+def deleteTest(item_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM test WHERE id = %s", (item_id,))
+        item = cursor.fetchone()
+        if item is None:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Item not found"}), 404
+
+        cursor.execute("DELETE FROM test WHERE id = %s", (item_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return '', 204
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500

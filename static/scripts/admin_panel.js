@@ -767,3 +767,93 @@ okButton.addEventListener('click', function() {
         modal.remove();
     });
 }
+
+
+function editTest(itemId) {
+    fetch(`/units_structure/test_by_id/${itemId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length === 0) {
+                console.error('No test data found for itemId:', itemId);
+                return;
+            }
+            const test = data[0];
+
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Редагувати Тест</h2>
+                    <label for="question">Питання:</label>
+                    <textarea id="question" rows="4" cols="50" style="margin-top: 10px; margin-bottom: 10px;">${test.question}</textarea>
+
+                    <label for="option1" style="margin-top: 10px;">Варіант відповіді 1:</label>
+                    <input type="text" id="option1" value="${test.choice1}" style="margin-bottom: 10px; display: block;"><br>
+
+                    <label for="option2">Варіант відповіді 2:</label>
+                    <input type="text" id="option2" value="${test.choice2}" style="margin-bottom: 10px; display: block;"><br>
+
+                    <label for="option3">Варіант відповіді 3:</label>
+                    <input type="text" id="option3" value="${test.choice3}" style="margin-bottom: 10px; display: block;"><br>
+
+                    <label for="option4">Варіант відповіді 4:</label>
+                    <input type="text" id="option4" value="${test.choice4}" style="margin-bottom: 10px; display: block;"><br>
+
+                    <label for="correct-answer">Правильна відповідь:</label>
+                    <input type="text" id="correct-answer" value="${test.answer}" style="margin-bottom: 10px; display: block;"><br>
+
+                    <label for="solution">Опис рішення:</label>
+                    <textarea id="solution" rows="4" cols="50" style="margin-top: 10px; margin-bottom: 10px;">${test.description}</textarea>
+
+                    <div class="modal-buttons">
+                        <button id="ok-button" class="button">OK</button>
+                        <button id="cancel-button" class="button cancel">Відмінити</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            const okButton = modal.querySelector('#ok-button');
+            const cancelButton = modal.querySelector('#cancel-button');
+
+            okButton.addEventListener('click', function() {
+                const questionValue = document.getElementById('question').value;
+                const option1Value = document.getElementById('option1').value;
+                const option2Value = document.getElementById('option2').value;
+                const option3Value = document.getElementById('option3').value;
+                const option4Value = document.getElementById('option4').value;
+                const correctAnswerValue = document.getElementById('correct-answer').value;
+                const solutionValue = document.getElementById('solution').value;
+
+                fetch(`/editTest/${itemId}`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        question: questionValue,
+                        option1: option1Value,
+                        option2: option2Value,
+                        option3: option3Value,
+                        option4: option4Value,
+                        correct_answer: correctAnswerValue,
+                        solution: solutionValue
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        modal.remove();
+                        // Завантажити оновлені дані
+                        loadTest(itemId, document.querySelector(`[data-item-id="${itemId}"]`));
+                    } else {
+                        console.error('Failed to edit test');
+                    }
+                }).catch(error => console.error('Error:', error));
+            });
+
+            cancelButton.addEventListener('click', function() {
+                modal.remove();
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
