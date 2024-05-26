@@ -172,6 +172,25 @@ def get_theory(item_id):
     conn.close()
     print("Fetched tests:", theorys)
     return jsonify(theorys)
+
+@post_routes.route('/getMaterialById/<int:item_id>', methods=['GET'])
+def getMaterialById(item_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT title, description FROM materials WHERE id = %s', (item_id,))
+        material = cursor.fetchone()
+        conn.close()
+
+        if material:
+            return jsonify({"title": material[0], "description": material[1]}), 200
+        else:
+            return jsonify({"error": "Material not found"}), 404
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 @post_routes.route('/delete/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
     try:
@@ -430,6 +449,46 @@ def addMaterial(item_id):
         conn.close()
 
         return jsonify({"message": "Material added successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/editMaterial/<int:item_id>', methods=['POST'])
+def editMaterial(item_id):
+    try:
+        data = request.json
+        title = data['title']
+        description = data['description']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('UPDATE materials SET title = %s, description = %s WHERE id = %s', (title, description, item_id))
+
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Test updated successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@post_routes.route('/deleteMaterial/<int:item_id>', methods=['POST'])
+def deleteMaterial(item_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM materials WHERE id = %s", (item_id,))
+        item = cursor.fetchone()
+        if item is None:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Item not found"}), 404
+
+        cursor.execute("DELETE FROM materials WHERE id = %s", (item_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return '', 204
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500

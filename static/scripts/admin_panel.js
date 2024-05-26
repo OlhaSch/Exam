@@ -410,7 +410,7 @@ function loadTheory(unitId, parentLi) {
 
                 imgDelete.addEventListener('click', function(event) {
                     event.stopPropagation();
-                    fetch(`/deleteTheory/${theory.id}`, { method: 'POST' })
+                    fetch(`/deleteMaterial/${theory.id}`, { method: 'POST' })
                         .then(response => {
                             if (response.ok) {
                                 li.remove();
@@ -423,7 +423,7 @@ function loadTheory(unitId, parentLi) {
 
                 imgEdit.addEventListener('click', function(event) {
                     event.stopPropagation();
-                    editTheory(theory.id);
+                    editMaterials(theory.id);
                 });
 
             });
@@ -908,4 +908,61 @@ function addMaterials(itemId) {
     cancelButton.addEventListener('click', function() {
         modal.remove();
     });
+}
+
+function editMaterials(itemId) {
+    fetch(`/getMaterialById/${itemId}`)
+        .then(response => response.json())
+        .then(material => {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Редагувати матеріал</h2>
+                    <label for="title">Заголовок:</label>
+                    <input type="text" id="title" style="margin-top: 10px; margin-bottom: 10px; display: block;" value="${material.title}"><br>
+
+                    <label for="description">Опис:</label>
+                    <textarea id="description" rows="4" cols="50" style="margin-top: 10px; margin-bottom: 10px;">${material.description}</textarea>
+
+                    <div class="modal-buttons">
+                        <button id="ok-button" class="button">OK</button>
+                        <button id="cancel-button" class="button cancel">Відмінити</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            const okButton = modal.querySelector('#ok-button');
+            const cancelButton = modal.querySelector('#cancel-button');
+
+            okButton.addEventListener('click', function() {
+                const titleValue = document.getElementById('title').value;
+                const descriptionValue = document.getElementById('description').value;
+
+                fetch(`/editMaterial/${itemId}`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        title: titleValue,
+                        description: descriptionValue
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        modal.remove();
+                        loadItems(); // Виклик функції для оновлення списку матеріалів
+                    } else {
+                        console.error('Failed to edit material');
+                    }
+                }).catch(error => console.error('Error:', error));
+            });
+
+            cancelButton.addEventListener('click', function() {
+                modal.remove();
+            });
+        })
+        .catch(error => console.error('Error:', error));
 }
