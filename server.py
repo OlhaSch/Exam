@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, flash, Blueprint, jsonify
+from flask import Flask, request, redirect, url_for, flash, Blueprint, jsonify, session
 import psycopg2
 import mysql.connector
 
@@ -25,18 +25,24 @@ def login_admin():
     email = request.form['email']
     password = request.form['password']
     conn = get_db_connection()
+
+    if not conn:
+        flash("Не вдалося підключитися до бази даних", "error")
+        return redirect(url_for('admin_panel_auth'))
+
     cursor = conn.cursor()
     try:
-        cursor.execute('Select * From users WHERE login = %s AND password = %s', (email, password))
+        cursor.execute('SELECT * FROM users WHERE login = %s AND password = %s', (email, password))
         user = cursor.fetchone()
         if user:
+            session['admin'] = email
             print(f"Користувача {email} знайдено")
             return redirect(url_for('admin_panel'))
         else:
-            flash("Не вірні дані, спробуйте ще раз.", "error")
+            flash("Невірні дані, спробуйте ще раз.", "error")
             return redirect(url_for('admin_panel_auth'))
     except psycopg2.Error as e:
-        flash(f"Помилка при виконанні запиту {e}", "error")
+        flash(f"Помилка при виконанні запиту: {e}", "error")
         return redirect(url_for('admin_panel_auth'))
     finally:
         conn.close()
@@ -47,18 +53,24 @@ def auth():
     login = request.form['email']
     password = request.form['password']
     conn = get_db_connection()
+
+    if not conn:
+        flash("Не вдалося підключитися до бази даних", "error")
+        return redirect(url_for('user_auth'))
+
     cursor = conn.cursor()
     try:
-        cursor.execute('Select * From users WHERE login = %s AND password = %s', (login, password))
-        users = cursor.fetchone()
-        if users:
+        cursor.execute('SELECT * FROM users WHERE login = %s AND password = %s', (login, password))
+        user = cursor.fetchone()
+        if user:
+            session['user'] = login
             print(f"User {login} was found")
             return redirect(url_for('test'))
         else:
-            flash("Не вірні дані, спробуйте ще раз.", "error")
+            flash("Невірні дані, спробуйте ще раз.", "error")
             return redirect(url_for('user_auth'))
     except psycopg2.Error as e:
-        flash(f"Помилка при виконанні запиту {e}", "error")
+        flash(f"Помилка при виконанні запиту: {e}", "error")
         return redirect(url_for('user_auth'))
     finally:
         conn.close()
