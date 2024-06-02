@@ -1,6 +1,7 @@
 from flask import Flask, request, redirect, url_for, flash, Blueprint, jsonify, session
 import psycopg2
 import mysql.connector
+import os
 
 post_routes = Blueprint('post_routes', __name__)
 
@@ -9,10 +10,10 @@ def get_db_connection():
     conn = None
     try:
         conn = psycopg2.connect(
-            dbname='afikyvbw',
-            user='afikyvbw',
-            password='Ikyv32pHZyeY6uhOHOuQk0xULTNbjqVG',
-            host='isilo.db.elephantsql.com'
+            dbname=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            host=os.getenv('DB_HOST')
         )
         print("Connection with database: success")
     except psycopg2.Error as e:
