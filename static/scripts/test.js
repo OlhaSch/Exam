@@ -175,7 +175,7 @@ function loadTheory(unitId, parentLi) {
                 const li = document.createElement('li');
                 li.classList.add('theory-item');
                 li.textContent = `${theory.title}`;
-
+                li.addEventListener('click', () => showMaterials(theory.id));
                 ul.appendChild(li);
             });
 
@@ -192,6 +192,21 @@ function loadTheory(unitId, parentLi) {
             parentLi.classList.add('loaded');
         })
         .catch(error => console.error('Error:', error));
+}
+
+function generateItemList(items) {
+    const ul = document.createElement('ul');
+    ul.classList.add('item-list');
+
+    items.forEach(item => {
+        const li = document.createElement('li');
+        li.classList.add('item');
+        li.textContent = item.title;
+        li.addEventListener('click', () => showMaterials(item.id));
+        ul.appendChild(li);
+    });
+
+    document.body.appendChild(ul);
 }
 
 // Helper function to create image elements
@@ -336,6 +351,33 @@ data.forEach((test, index) => {
             });
 
             cancelButton.addEventListener('click', function () {
+                modal.remove();
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function showMaterials(itemId) {
+    fetch(`/getMaterialById/${itemId}`)
+        .then(response => response.json())
+        .then(material => {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>${material.title}</h2>
+                    <div style="margin-top: 10px; margin-bottom: 10px;">
+                        <p id="description" style="margin-top: 10px; margin-bottom: 10px; white-space: pre-wrap;">${material.description}</p>
+                    </div>
+                    <div class="modal-buttons" style="display: flex; justify-content: center;">
+                        <button id="cancel-button" class="button cancel">Закрити</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            const cancelButton = modal.querySelector('#cancel-button');
+            cancelButton.addEventListener('click', function() {
                 modal.remove();
             });
         })
