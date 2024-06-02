@@ -504,3 +504,33 @@ def deleteMaterial(item_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@post_routes.route('/checkAnswers', methods=['POST'])
+def check_answers():
+    answers = request.json  # Отримуємо масив відповідей від користувача
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    results = []
+
+    print("check_answers")
+    try:
+        for answer in answers:
+            cursor.execute("SELECT answer FROM test WHERE id = %s", (answer['id'],))
+            correct_answer = cursor.fetchone()
+            if correct_answer:
+                correct_answer_text = correct_answer[0].strip().lower() if correct_answer[0] else ''
+                user_answer_text = answer['user_answer'].strip().lower()
+                is_correct = correct_answer_text == user_answer_text
+                results.append({
+                    'id': answer['id'],
+                    'is_correct': is_correct
+                })
+                print(f"Test ID: {answer['id']}, User Answer: {answer['user_answer']}, Correct Answer: {correct_answer_text}, Result: {is_correct}")
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+    finally:
+        cursor.close()
+        conn.close()

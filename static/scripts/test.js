@@ -236,24 +236,39 @@ function editTest(itemId) {
                     <div class="tests-container">
             `;
 
-            data.forEach((test, index) => {
+data.forEach((test, index) => {
                 modalContent += `
-                    <div class="test-item">
-                        <label for="question-${index}"><br> Питання: <br>${test.question.replace(/\n/g, '<br>')}</label>
-                        <div><label for="option1-${index}" style="margin-top: 10px;">А: ${test.choice1}</label></div>
-                        <div><label for="option2-${index}">Б: ${test.choice2}</label></div>
-                        <div><label for="option3-${index}">В: ${test.choice3}</label></div>
-                        <div><label for="option4-${index}">Г: ${test.choice4}</label></div>
-
+                    <div class="test-item" data-id="${test.id}">
+                        <label for="question-${index}">Питання: <br>${test.question.replace(/\n/g, '<br>')}</label>
                         <div class="answer-boxes">
-                            <div class="correct-answer-box" data-option="1"></div>
-                            <div class="correct-answer-box" data-option="2"></div>
-                            <div class="correct-answer-box" data-option="3"></div>
-                            <div class="correct-answer-box" data-option="4"></div>
-                        </div><br>
+                            <div class="answer-option">
+                                <input type="radio" id="option1-${index}" name="answer-${test.id}" value="${test.choice1}">
+                                <label for="option1-${index}">${test.choice1}</label>
+                            </div>
+                        </div>
+                        <div class="answer-boxes">
+                            <div class="answer-option">
+                                <input type="radio" id="option2-${index}" name="answer-${test.id}" value="${test.choice2}">
+                                <label for="option2-${index}">${test.choice2}</label>
+                            </div>
+                        </div>
+                        <div class="answer-boxes">
+                            <div class="answer-option">
+                                <input type="radio" id="option3-${index}" name="answer-${test.id}" value="${test.choice3}">
+                                <label for="option3-${index}">${test.choice3}</label>
+                            </div>
+                        </div>
+                        <div class="answer-boxes">
+                            <div class="answer-option">
+                                <input type="radio" id="option4-${index}" name="answer-${test.id}" value="${test.choice4}">
+                                <label for="option4-${index}">${test.choice4}</label>
+                            </div>
+                        </div>
+                        <br>
                     </div>
                 `;
             });
+
 
             modalContent += `
                     </div>
@@ -267,58 +282,57 @@ function editTest(itemId) {
             modal.innerHTML = modalContent;
             document.body.appendChild(modal);
 
-            data.forEach((test, index) => {
-                const correctAnswer = test.answer;
-                const correctAnswerBoxes = modal.querySelectorAll(`.test-item:nth-child(${index + 1}) .correct-answer-box`);
-                correctAnswerBoxes.forEach(box => {
-                    if (box.dataset.option === correctAnswer) {
-                        box.classList.add('selected');
-                    }
-
-                    box.addEventListener('click', function () {
-                        correctAnswerBoxes.forEach(b => b.classList.remove('selected'));
-                        box.classList.add('selected');
-                    });
-                });
-            });
-
             const okButton = modal.querySelector('#ok-button');
             const cancelButton = modal.querySelector('#cancel-button');
+            const answerBoxes = modal.querySelectorAll('.answer-option input[type="radio"]');
+            let answersSubmitted = false;
 
             okButton.addEventListener('click', function () {
-                const updatedTests = [];
+                if (answersSubmitted) {
+                    return;
+                }
+
+                const userAnswers = [];
 
                 data.forEach((test, index) => {
-                    const selectedBox = modal.querySelector(`.test-item:nth-child(${index + 1}) .correct-answer-box.selected`);
-                    const correctAnswerValue = selectedBox ? selectedBox.dataset.option : '';
+                    const selectedOption = modal.querySelector(`input[name="answer-${test.id}"]:checked`);
+                    const userAnswer = selectedOption ? selectedOption.value : '';
 
-                    updatedTests.push({
+                    userAnswers.push({
                         id: test.id,
-                        question: test.question,
-                        option1: test.choice1,
-                        option2: test.choice2,
-                        option3: test.choice3,
-                        option4: test.choice4,
-                        correct_answer: correctAnswerValue,
-                        solution: test.solution
+                        user_answer: userAnswer
                     });
+
+                    console.log(`Test ID: ${test.id}, User Answer: ${userAnswer}`);  // Відладкове повідомлення
                 });
 
-                fetch(`/editTests`, {
+                fetch(`/checkAnswers`, {
                     method: 'POST',
-                    body: JSON.stringify(updatedTests),
+                    body: JSON.stringify(userAnswers),
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                }).then(response => {
-                    if (response.ok) {
-                        modal.remove();
-                        // Завантажити оновлені дані
-                        loadTest(itemId, document.querySelector(`[data-item-id="${itemId}"]`));
-                    } else {
-                        console.error('Failed to edit tests');
-                    }
+                }).then(response => response.json())
+                .then(results => {
+                    results.forEach(result => {
+                        const testItem = modal.querySelector(`.test-item[data-id="${result.id}"]`);
+                        if (result.is_correct) {
+                            testItem.classList.add('correct');
+                        } else {
+                            testItem.classList.add('incorrect');
+                        }
+                    });
                 }).catch(error => console.error('Error:', error));
+
+                // Деактивуємо можливість зміни відповідей
+                answerBoxes.forEach(box => {
+                    box.disabled = true;
+                });
+
+                // Деактивуємо кнопку OK, щоб вона не могла бути натиснута знову
+                okButton.disabled = true;
+
+                answersSubmitted = true; // Встановлюємо флаг, що відповіді вже відправлені
             });
 
             cancelButton.addEventListener('click', function () {
