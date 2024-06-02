@@ -220,33 +220,43 @@ document.addEventListener('click', function(event) {
 });
 
 function editTest(itemId) {
-    fetch(`/units_structure/test_by_id/${itemId}`)
+    fetch(`/units_structure/test/${itemId}`)
         .then(response => response.json())
         .then(data => {
             if (data.length === 0) {
                 console.error('No test data found for itemId:', itemId);
                 return;
             }
-            const test = data[0];
 
             const modal = document.createElement('div');
             modal.classList.add('modal');
-            modal.innerHTML = `
+            let modalContent = `
                 <div class="modal-content">
                     <h2>Проходження тестування</h2>
-                    <label for="question">Питання: <br> ${test.question}</label>
-                    <div><label for="option1" style="margin-top: 10px;">А: ${test.choice1}</label></div>
-                    <div><label for="option2">Б: ${test.choice2}</label></div>
-                    <div><label for="option3">В: ${test.choice3}</label></div>
-                    <div><label for="option4">Г: ${test.choice4}</label></div>
+                    <div class="tests-container">
+            `;
 
-                     <div class="answer-boxes">
-                        <div class="correct-answer-box" data-option="1"></div> <br>
-                        <div class="correct-answer-box" data-option="2"></div> <br>
-                        <div class="correct-answer-box" data-option="3"></div> <br>
-                        <div class="correct-answer-box" data-option="4"></div> <br>
-                    </div><br>
+            data.forEach((test, index) => {
+                modalContent += `
+                    <div class="test-item">
+                        <label for="question-${index}"><br> Питання: <br>${test.question.replace(/\n/g, '<br>')}</label>
+                        <div><label for="option1-${index}" style="margin-top: 10px;">А: ${test.choice1}</label></div>
+                        <div><label for="option2-${index}">Б: ${test.choice2}</label></div>
+                        <div><label for="option3-${index}">В: ${test.choice3}</label></div>
+                        <div><label for="option4-${index}">Г: ${test.choice4}</label></div>
 
+                        <div class="answer-boxes">
+                            <div class="correct-answer-box" data-option="1"></div>
+                            <div class="correct-answer-box" data-option="2"></div>
+                            <div class="correct-answer-box" data-option="3"></div>
+                            <div class="correct-answer-box" data-option="4"></div>
+                        </div><br>
+                    </div>
+                `;
+            });
+
+            modalContent += `
+                    </div>
                     <div class="modal-buttons">
                         <button id="ok-button" class="button">OK</button>
                         <button id="cancel-button" class="button cancel">Відмінити</button>
@@ -254,46 +264,49 @@ function editTest(itemId) {
                 </div>
             `;
 
+            modal.innerHTML = modalContent;
             document.body.appendChild(modal);
 
-            // Позначення правильної відповіді
-            const correctAnswer = test.answer;
-            const correctAnswerBoxes = modal.querySelectorAll('.correct-answer-box');
-            correctAnswerBoxes.forEach(box => {
-                if (box.dataset.option === correctAnswer) {
-                    box.classList.add('selected');
-                }
+            data.forEach((test, index) => {
+                const correctAnswer = test.answer;
+                const correctAnswerBoxes = modal.querySelectorAll(`.test-item:nth-child(${index + 1}) .correct-answer-box`);
+                correctAnswerBoxes.forEach(box => {
+                    if (box.dataset.option === correctAnswer) {
+                        box.classList.add('selected');
+                    }
 
-                box.addEventListener('click', function() {
-                    correctAnswerBoxes.forEach(b => b.classList.remove('selected'));
-                    box.classList.add('selected');
+                    box.addEventListener('click', function () {
+                        correctAnswerBoxes.forEach(b => b.classList.remove('selected'));
+                        box.classList.add('selected');
+                    });
                 });
             });
 
             const okButton = modal.querySelector('#ok-button');
             const cancelButton = modal.querySelector('#cancel-button');
 
-            okButton.addEventListener('click', function() {
-                const questionValue = document.getElementById('question').value;
-                const option1Value = document.getElementById('option1').value;
-                const option2Value = document.getElementById('option2').value;
-                const option3Value = document.getElementById('option3').value;
-                const option4Value = document.getElementById('option4').value;
-                const selectedBox = modal.querySelector('.correct-answer-box.selected');
-                const correctAnswerValue = selectedBox ? selectedBox.dataset.option : '';
-                const solutionValue = document.getElementById('solution').value;
+            okButton.addEventListener('click', function () {
+                const updatedTests = [];
 
-                fetch(`/editTest/${itemId}`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        question: questionValue,
-                        option1: option1Value,
-                        option2: option2Value,
-                        option3: option3Value,
-                        option4: option4Value,
+                data.forEach((test, index) => {
+                    const selectedBox = modal.querySelector(`.test-item:nth-child(${index + 1}) .correct-answer-box.selected`);
+                    const correctAnswerValue = selectedBox ? selectedBox.dataset.option : '';
+
+                    updatedTests.push({
+                        id: test.id,
+                        question: test.question,
+                        option1: test.choice1,
+                        option2: test.choice2,
+                        option3: test.choice3,
+                        option4: test.choice4,
                         correct_answer: correctAnswerValue,
-                        solution: solutionValue
-                    }),
+                        solution: test.solution
+                    });
+                });
+
+                fetch(`/editTests`, {
+                    method: 'POST',
+                    body: JSON.stringify(updatedTests),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -303,12 +316,12 @@ function editTest(itemId) {
                         // Завантажити оновлені дані
                         loadTest(itemId, document.querySelector(`[data-item-id="${itemId}"]`));
                     } else {
-                        console.error('Failed to edit test');
+                        console.error('Failed to edit tests');
                     }
                 }).catch(error => console.error('Error:', error));
             });
 
-            cancelButton.addEventListener('click', function() {
+            cancelButton.addEventListener('click', function () {
                 modal.remove();
             });
         })
