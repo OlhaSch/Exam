@@ -1,0 +1,71 @@
+        /* Додайте стилі для заголовку */
+.auth-main-container h1 {
+    color: #ffffff; /* Колір тексту */
+    font-size: 24px; /* Розмір шрифту */
+    margin-bottom: 20px; /* Відступ від інших елементів */
+}
+
+.auth-fill-items .item {
+    display: flex; /* Встановіть властивість flex для вирівнювання елементів по горизонталі */
+    align-items: center; /* Вирівняйте елементи по вертикалі по центру */
+}
+
+
+.auth-fill-items .button {
+    flex: 1; /* Розтягніть кнопку на всю доступну ширину */
+}
+
+/* Додайте стилі для інпутів */
+.fill-input input {
+    width: 100%; /* Ширина інпуту */
+    padding: 10px; /* Внутрішній відступ */
+    margin-bottom: 20px; /* Відступ від наступного елементу */
+    border: 1px solid #ccc; /* Обрамлення інпуту */
+    border-radius: 5px; /* Радіус кутів */
+}
+
+.button {
+    display: inline-block; /* Зміна на інлайн-блок */
+    width: calc(100% - 10px); /* Ширина вираховується відносно батьківського блоку з відступами */
+    margin-top: 15px; /* Додайте потрібний відступ між елементами */
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+h1 {
+    color: #fff; /* Колір тексту */
+    font-size: 24px; /* Розмір шрифту */
+    margin-bottom: 20px; /* Відступ від інших елементів */
+}
+
+
+.auth-main-container h1 {
+    color: #333; /* Змініть колір тексту на білий або будь-який інший, який вам подобається */
+    font-size: 28px; /* Збільште розмір шрифту за потреби */
+    margin-bottom: 30px; /* Збільште відстань між заголовком та іншими елементами форми */
+}
+.head-auth-fill {
+    text-align: center; /* Розмістіть текст по центру */
+}
+
+
+
+.button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+form {
+    max-width: 25%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
