@@ -473,8 +473,15 @@ document.addEventListener('click', function(event) {
 
 
 
-document.getElementById('addSubjectButton').addEventListener('click', function(event) {
+let addButtonClicked = false; // Прапорець, щоб перевірити, чи був вже клік на кнопку
+
+const addSubjectButton = document.getElementById('addSubjectButton');
+
+function handleClick(event) {
+    if (addButtonClicked) return; // Якщо кнопка вже була натиснута, ігноруємо подію
+    addButtonClicked = true; // Встановлюємо прапорець, що кнопка була натиснута
     event.preventDefault();
+
     fetch('/addSubject', {
         method: 'POST',
     })
@@ -488,8 +495,15 @@ document.getElementById('addSubjectButton').addEventListener('click', function(e
     })
     .catch(error => {
         console.error('Помилка:', error);
+    })
+    .finally(() => {
+        addButtonClicked = false; // Повертаємо значення прапорця на false після виконання коду
     });
-});
+}
+
+addSubjectButton.removeEventListener('click', handleClick); // Видаляємо попередній обробник подій
+addSubjectButton.addEventListener('click', handleClick); // Додаємо новий обробник подій
+
 
 
 //редагувати предмет
