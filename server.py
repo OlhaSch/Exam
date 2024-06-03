@@ -293,12 +293,19 @@ def editSection(item_id):
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
 
+
 @post_routes.route('/addSection/<int:item_id>', methods=['POST'])
 def addSection(item_id):
     try:
         new_text = request.json['text']
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Перевірка на дублювання секції
+        cursor.execute('SELECT COUNT(*) FROM section WHERE section = %s AND id_subject = %s', (new_text, item_id))
+        if cursor.fetchone()[0] > 0:
+            return jsonify({"error": "Section already exists"}), 409
+
         cursor.execute("SELECT MAX(id) FROM section")
         max_id = cursor.fetchone()[0]
         new_id = (max_id + 1) if max_id else 1
