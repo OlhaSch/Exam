@@ -555,6 +555,10 @@ function addSection(itemId) {
     const okButton = modal.querySelector('#ok-button');
     const cancelButton = modal.querySelector('#cancel-button');
 
+    // Заборона повторних натискань на кнопки до завершення поточного запиту
+    okButton.disabled = true;
+    cancelButton.disabled = true;
+
     okButton.addEventListener('click', function() {
         const addText = document.getElementById('add-text').value;
         fetch(`/addSection/${itemId}`, { // Динамічний шлях з itemId
@@ -570,7 +574,11 @@ function addSection(itemId) {
             } else {
                 console.error('Failed to add section');
             }
-        }).catch(error => console.error('Error:', error));
+        }).catch(error => console.error('Error:', error))
+        .finally(() => {
+            okButton.disabled = false;
+            cancelButton.disabled = false;
+        });
     });
 
     cancelButton.addEventListener('click', function() {
