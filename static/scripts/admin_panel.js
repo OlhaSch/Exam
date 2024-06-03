@@ -1,3 +1,11 @@
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 function loadItems() {
     fetch('/test_structure/items')
         .then(response => response.json())
@@ -45,10 +53,10 @@ function loadItems() {
                 li.style.cursor = 'pointer'; // Зміна курсору при наведенні на текст
                 ul.appendChild(li);
 
-                li.addEventListener('click', function() {
+                li.addEventListener('click', debounce(function() {
                     li.classList.toggle('open');
                     loadSections(item.id, li);
-                });
+                }, 300));
 
                 imgDelete.addEventListener('click', function(event) {
                     event.stopPropagation();
@@ -527,6 +535,9 @@ function createModal(itemId) {
 }
 
 function addSection(itemId) {
+    // Перевірка, чи вже існує модальне вікно перед додаванням нового
+    if (document.querySelector('.modal')) return;
+
     const modal = document.createElement('div');
     modal.classList.add('modal');
     modal.innerHTML = `
