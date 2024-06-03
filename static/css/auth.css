@@ -1,33 +1,38 @@
-        /* Додайте стилі для заголовку */
-.auth-main-container h1 {
-    color: #ffffff; /* Колір тексту */
-    font-size: 24px; /* Розмір шрифту */
-    margin-bottom: 20px; /* Відступ від інших елементів */
+
+.auth-fill-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
 
 .auth-fill-items .item {
-    display: flex; /* Встановіть властивість flex для вирівнювання елементів по горизонталі */
-    align-items: center; /* Вирівняйте елементи по вертикалі по центру */
+    width: 100%;
+    margin-bottom: 20px;
 }
 
-
 .auth-fill-items .button {
-    flex: 1; /* Розтягніть кнопку на всю доступну ширину */
+    width: calc(100% - 10px);
+    margin-top: 15px;
 }
 
 /* Додайте стилі для інпутів */
+.fill-input {
+    width: 100%;
+    margin-bottom: 20px;
+}
 .fill-input input {
-    width: 100%; /* Ширина інпуту */
-    padding: 10px; /* Внутрішній відступ */
-    margin-bottom: 20px; /* Відступ від наступного елементу */
-    border: 1px solid #ccc; /* Обрамлення інпуту */
-    border-radius: 5px; /* Радіус кутів */
+    width: calc(100% - 24px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
 .button {
-    display: inline-block; /* Зміна на інлайн-блок */
-    width: calc(100% - 10px); /* Ширина вираховується відносно батьківського блоку з відступами */
-    margin-top: 15px; /* Додайте потрібний відступ між елементами */
+    display: inline-block;
+    width: calc(100% - 10px);
+    margin-top: 15px;
     padding: 12px 24px;
     font-size: 16px;
     border: none;
@@ -45,13 +50,12 @@ h1 {
 }
 
 
-.auth-main-container h1 {
-    color: #333; /* Змініть колір тексту на білий або будь-який інший, який вам подобається */
-    font-size: 28px; /* Збільште розмір шрифту за потреби */
-    margin-bottom: 30px; /* Збільште відстань між заголовком та іншими елементами форми */
-}
+
 .head-auth-fill {
     text-align: center; /* Розмістіть текст по центру */
+}
+.fill-input input {
+    width: 100%; /* Робимо ширину input полів такою самою, як ширина тексту "Авторизація" */
 }
 
 
@@ -62,10 +66,16 @@ h1 {
 }
 
 form {
-    max-width: 25%;
+    max-width: 400px; /* Збільште максимальну ширину форми за потребою */
     margin: 0 auto;
     padding: 20px;
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.auth-main-container h1 {
+    color: #333; /* Змініть колір тексту на білий або будь-який інший, який вам подобається */
+    font-size: 28px; /* Збільште розмір шрифту за потреби */
+    margin-bottom: 30px; /* Збільште відстань між заголовком та іншими елементами форми */
 }
